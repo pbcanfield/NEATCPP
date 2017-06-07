@@ -1,5 +1,6 @@
 #include <vector>
 #include <string>
+#include <fstream>
 #include "Gene.h"
 
 class Genome
@@ -25,6 +26,8 @@ public:
 	unsigned int getOutput();
 
 private:
+	void gotoLine(std::ifstream & file, unsigned int);
+
 	std::vector<Gene> geneticCode;
 
 	unsigned int input;
