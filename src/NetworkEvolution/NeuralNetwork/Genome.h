@@ -26,7 +26,6 @@ public:
 	unsigned int getOutput();
 
 private:
-	void gotoLine(std::ifstream & file, unsigned int);
 
 	std::vector<Gene> geneticCode;
 

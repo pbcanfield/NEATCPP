@@ -2,7 +2,7 @@
 #include <vector>
 #include "NetworkEvolution/NetworkManager.h"
 #include "NetworkEvolution/NeuralNetwork/Genome.h"
-//#include "NetworkEvolution/NeuralNetwork/Gene.h"
+
 
 int main( int argc, char * argv[])
 {
@@ -21,8 +21,12 @@ int main( int argc, char * argv[])
      test.setHidden(topo);
      test.setOutput(2);
      test.addGene(cool);
+     test.saveGenome("test.charzar");
+     test.loadFromFile("test.charzar");
 
-     test.loadFromFile("test.txt");
 
+     std::cout << test.getGene(0).inID << ' ' << test.getGene(0).outID <<
+          ' ' << test.getGene(0).weight << ' '  << test.getGene(0).enabled << ' '  <<
+          test.getGene(0).generation << std::endl;
      return 0;
 }
