@@ -1,0 +1,7 @@
+class Node
+{
+public:
+
+private:
+          
+};
