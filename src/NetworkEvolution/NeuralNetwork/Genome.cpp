@@ -46,7 +46,7 @@ void Genome::saveGenome(std::string dir)
 {
      std::ofstream charizard(dir, std::ios::binary);
 
-     if(file.is_open())
+     if(charizard.is_open())
      {
           //writes the metadata to the file
           //the first int that is written is the size of the metadata
@@ -84,7 +84,7 @@ void Genome::saveGenome(std::string dir)
      {
           std::cout << "Could not open file " << dir << std::endl;
      }
-     file.close();
+     charizard.close();
 }
 
 void Genome::loadFromFile(std::string dir)

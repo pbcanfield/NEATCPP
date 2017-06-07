@@ -1,3 +1,6 @@
+#ifndef NODE_H
+#define NODE_H
+
 class Node
 {
 public:
@@ -5,3 +8,5 @@ public:
 private:
           
 };
+
+#endif

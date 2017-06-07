@@ -1,5 +1,8 @@
+debug:
+	g++ -Wall -g -std=c++14 -pthread src/main.cpp src/NetworkEvolution/NeuralNetwork/Genome.cpp -o exec/NEAT
+
 NEAT:	NetworkManager.o Genome.o NeuralNetwork.o Node.o main.o
-	g++ -Wall -g -std=c++14 -pthread obj/NetworkManager.o obj/Genome.o obj/NeuralNetwork.o obj/Node.o obj/main.o -o exec/NEAT
+	g++ -Wall -g -std=c++14 -pthread obj/NetworkManager.o obj/NeuralNetwork.o obj/Node.o obj/Genome.o obj/main.o -o exec/NEAT
 
 main.o:	src/main.cpp
 	g++ -Wall -g -std=c++14 -pthread src/main.cpp -o obj/main.o

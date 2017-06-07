@@ -1,3 +1,6 @@
+#ifndef NETWORKMANAGER_H
+#define NETWORKMANAGER_H
+
 class NetworkManager
 {
 public:
@@ -6,3 +9,5 @@ private:
      
 
 };
+
+#endif
