@@ -20,6 +20,7 @@ public:
 	void loadFromFile(std::string);
 
 	Gene getGene(unsigned int);
+	unsigned int getGenomeSize();
 
 	unsigned int getInput();
 	std::vector<unsigned int> getHidden();

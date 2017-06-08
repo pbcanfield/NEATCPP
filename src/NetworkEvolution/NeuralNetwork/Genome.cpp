@@ -65,19 +65,6 @@ void Genome::saveGenome(std::string dir)
           charizard.write((char*)&gene.generation,sizeof(int));
      }
 
-     /*
-     file << "--------Metadata--------" << std::endl;
-     file << input;
-     for(auto & size : hiddenLayer)
-          file << ',' << size;
-     file << ',' << output << std::endl;
-     file << "--------Metadata--------" << std::endl;
-
-     for(auto & gene : geneticCode)
-          file << gene.inID << ',' << gene.outID << ',' << gene.weight
-               << ',' << gene.enabled << ',' << gene.generation << std::endl;
-     */
-
 
      charizard.close();
 }
@@ -113,7 +100,7 @@ void Genome::loadFromFile(std::string dir)
                cry.read((char*)&temp.generation,sizeof(int));
                geneticCode.push_back(temp);
           }
-
+          geneticCode.pop_back(); // this is a work around and needs to be fixed
      }
      else
      {
@@ -125,6 +112,11 @@ void Genome::loadFromFile(std::string dir)
 Gene Genome::getGene(unsigned int pos)
 {
      return geneticCode[pos];
+}
+
+unsigned int Genome::getGenomeSize()
+{
+     return geneticCode.size();
 }
 
 unsigned int Genome::getInput()

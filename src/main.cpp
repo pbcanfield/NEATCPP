@@ -21,12 +21,22 @@ int main( int argc, char * argv[])
      test.setHidden(topo);
      test.setOutput(2);
      test.addGene(cool);
+
+     cool.inID = 53;
+     cool.outID = 10;
+     cool.weight = 0.9;
+     cool.enabled = false;
+     cool.generation = 100;
+
+     for(unsigned int i = 0; i < 100; ++i)
+          test.addGene(cool);
+
      test.saveGenome("test.charzar");
      test.loadFromFile("test.charzar");
 
-
-     std::cout << test.getGene(0).inID << ' ' << test.getGene(0).outID <<
-          ' ' << test.getGene(0).weight << ' '  << test.getGene(0).enabled << ' '  <<
-          test.getGene(0).generation << std::endl;
+     for(unsigned int i = 0; i < test.getGenomeSize(); ++i)
+          std::cout << test.getGene(i).inID << ' ' << test.getGene(i).outID <<
+               ' ' << test.getGene(i).weight << ' '  << test.getGene(i).enabled << ' '  <<
+               test.getGene(i).generation << std::endl;
      return 0;
 }
