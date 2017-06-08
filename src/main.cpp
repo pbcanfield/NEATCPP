@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include "NetworkEvolution/NetworkManager.h"
-#include "NetworkEvolution/NeuralNetwork/Genome.h"
+
 
 
 int main( int argc, char * argv[])

@@ -1,3 +1,6 @@
+#ifndef GENOME_H
+#define GENOME_H
+
 #include <vector>
 #include <string>
 #include <fstream>
@@ -34,3 +37,5 @@ private:
 	std::vector<unsigned int> hiddenLayer;
 	unsigned int output;
 };
+
+#endif

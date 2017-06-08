@@ -77,7 +77,7 @@ void Genome::loadFromFile(std::string dir)
 
      if(cry.is_open())
      {
-          int totalSize;
+          unsigned int totalSize;
           cry.read((char*)&totalSize,sizeof(int));
           cry.read((char*)&input,sizeof(int));
 
