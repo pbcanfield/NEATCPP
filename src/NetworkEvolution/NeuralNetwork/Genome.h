@@ -1,3 +1,6 @@
+#ifndef GENOME_H
+#define GENOME_H
+
 #include <vector>
 #include <string>
 #include <fstream>
@@ -20,13 +23,13 @@ public:
 	void loadFromFile(std::string);
 
 	Gene getGene(unsigned int);
+	unsigned int getGenomeSize();
 
 	unsigned int getInput();
 	std::vector<unsigned int> getHidden();
 	unsigned int getOutput();
 
 private:
-	void gotoLine(std::ifstream & file, unsigned int);
 
 	std::vector<Gene> geneticCode;
 
@@ -34,3 +37,5 @@ private:
 	std::vector<unsigned int> hiddenLayer;
 	unsigned int output;
 };
+
+#endif
