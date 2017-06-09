@@ -1,10 +1,15 @@
 #include "Genome.h"
 #include <iostream>
-#include <string>
+
 
 Genome::Genome()
 {
 
+}
+
+Genome::Genome(std::string dir)
+{
+     loadFromFile(dir);
 }
 
 void Genome::addGene(Gene gene)

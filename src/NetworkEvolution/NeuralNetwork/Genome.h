@@ -10,6 +10,7 @@ class Genome
 {
 public:
 	Genome();
+	Genome(std::string);
 	void addGene(Gene);
 	void setInput(unsigned int);
 	void setHidden(std::vector<unsigned int>);
