@@ -50,6 +50,7 @@ void Genome::setOutput(unsigned int output)
 void Genome::saveGenome(std::string dir)
 {
      std::ofstream charizard(dir, std::ios::binary);
+
      //writes the metadata to the file
      //the first int that is written is the size of the metadata
      //then the input, the hiddenLayer, and the outputlayer is written
@@ -62,6 +63,7 @@ void Genome::saveGenome(std::string dir)
      charizard.write((char*)&output,sizeof(int));
 
      for(auto & gene: geneticCode)
+
      {
           charizard.write((char*)&gene.inID,sizeof(int));
           charizard.write((char*)&gene.outID,sizeof(int));
@@ -69,7 +71,6 @@ void Genome::saveGenome(std::string dir)
           charizard.write((char*)&gene.enabled,sizeof(bool));
           charizard.write((char*)&gene.generation,sizeof(int));
      }
-
 
      charizard.close();
 }

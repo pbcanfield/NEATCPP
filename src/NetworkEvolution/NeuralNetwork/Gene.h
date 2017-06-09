@@ -8,4 +8,6 @@ struct Gene
 	bool enabled;
 	int generation;
 };
+
 #endif 
+
