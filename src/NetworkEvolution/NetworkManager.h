@@ -5,9 +5,9 @@
 
 class NetworkManager
 {
-public:
-     NetworkManager();
-private:
+ public:
+  NetworkManager();
+ private:
 
 
 };
