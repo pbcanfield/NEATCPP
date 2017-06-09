@@ -1,10 +1,7 @@
 #ifndef NETWORKMANAGER_H
 #define NETWORKMANAGER_H
-<<<<<<< HEAD
-=======
-#include "NeuralNetwork/NeuralNetwork.h"
 
->>>>>>> master
+#include "NeuralNetwork/NeuralNetwork.h"
 
 class NetworkManager
 {
