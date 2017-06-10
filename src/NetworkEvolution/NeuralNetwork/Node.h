@@ -3,24 +3,37 @@
 
 #include <vector>
 #include <iostream>
-#include "Weight.h"
 
 class Node
 {
- public:
-  Node();
+public:
+    Node();
+    ~Node();
+    
+    // Calculating and Learning
+    double const value();
+    void backwardProp();
 
-  void forwardProp();
-  void backwardProp();
-  
-  double sigDeriv();
-  double value();
-  
- private:
-  std::vector<Weight*> fConnections;
-  std::vector<Weight*> bConnections;
+    // Expanding the network
+    void addFConnections();
+    void addBConnections();
 
-  double bias;
+    // Modifying the network
+    void removeFConnections();
+    void removeBConnections();
+
+    // Getter
+    std::vector<Weight*> const fConnections();
+    std::vector<Weight*> const bConnections();
+    
+    // Utility functions
+    double const sigDeriv();
+  
+private:
+    std::vector<Weight*> fConnections;
+    std::vector<Weight*> bConnections;
+
+    double bias = 0;
 
 };
 

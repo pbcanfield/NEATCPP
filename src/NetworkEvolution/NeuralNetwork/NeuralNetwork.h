@@ -6,9 +6,9 @@
 
 class NeuralNetwork
 {
-public:
-
-private:
+  public:
+    
+  private:
 
 };
 
