@@ -110,6 +110,19 @@ void Genome::loadFromFile(std::string dir)
 }
 
 
+void Genome::copyIntoGenome(Genome & code)
+{
+    geneticCode = code.getGenes();
+    input = code.getInput();
+    hiddenLayer = code.getHidden();
+    output = code.getOutput();
+}
+
+std::vector<Gene> Genome::getGenes()
+{
+    return geneticCode;
+}
+
 Gene Genome::getGene(unsigned int pos)
 {
      return geneticCode[pos];

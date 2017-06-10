@@ -6,13 +6,16 @@
 class Node;
 class Weight
 {
- public:
-  Weight();
-  
- private:
-  Node* fconnection;
-  Node* bconnection;
-  double weight;
+public:
+    Weight();
+    ~Weight();
+
+    void setWeight(double);
+    double getWeight();
+private:
+    Node* fconnection;
+    Node* bconnection;
+    double weight;
 };
 
 #endif
