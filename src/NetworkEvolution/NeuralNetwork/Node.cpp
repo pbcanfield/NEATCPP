@@ -15,9 +15,9 @@ Node::~Node()
         delete connection;
 }
 
-void Node::addForward()
+void Node::addForward(Node * forward, Node * back)
 {
-    fConnections.push_back(new Weight());
+    fConnections.push_back(new Weight(forward,back));
 }
 
 void Node::addBackwards(Weight * weight)

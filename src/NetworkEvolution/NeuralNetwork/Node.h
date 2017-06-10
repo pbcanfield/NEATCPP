@@ -13,7 +13,7 @@ public:
 
     void forwardProp();
     void backwardProp();
-    void addForward();
+    void addForward(Node *, Node *);
     void addBackwards(Weight *);
 
     Weight * getLastForward();

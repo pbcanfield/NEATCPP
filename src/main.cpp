@@ -69,6 +69,7 @@ int main( int argc, char * argv[])
     gene.weight = 0.5;
     gene.enabled = true;
     code.addGene(gene);
+    
     code.saveGenome("../TestGenome.charzar");
     */
     NeuralNetwork testNetwork;

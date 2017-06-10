@@ -62,15 +62,19 @@ void NeuralNetwork::updateStructure()
     //Connect structure based on the genes in the genome and add the correct weights.
     unsigned int numConnections = dna -> getGenes().size();
     Gene currentGene;
+    Node * first;
+    Node * last;
+    Weight * weight;
     for(unsigned int i = 0; i < numConnections; ++i)
     {
-        std::cout << "top of loop" << std::endl;
         currentGene = dna -> getGene(i);
-        Node first = *findNodeWithID(currentGene.inID);
-        Node last = *findNodeWithID(currentGene.outID);
-        first.addForward();
-        first.getLastForward() -> setWeight(currentGene.weight);
-        last.addBackwards(first.getLastForward());
+        first = findNodeWithID(currentGene.inID);
+        last = findNodeWithID(currentGene.outID);
+        first -> addForward(last,first);
+        weight = first -> getLastForward();
+        weight -> weight() = currentGene.weight;
+        last -> addBackwards(weight);
+
     }
 
 }
@@ -122,7 +126,7 @@ Node * NeuralNetwork::findNodeWithID(unsigned int ID)
     }
     else
     {
-        ID -= (inputs.size() - 1) + (hiddenLayerSize - 1);
+        ID -= inputs.size() + hiddenLayerSize;
         return outputs[ID];
     }
     return NULL; //If this works this will never execute.

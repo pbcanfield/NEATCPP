@@ -7,15 +7,14 @@ class Node;
 class Weight
 {
 public:
-    Weight();
+    Weight(Node *, Node *);
     ~Weight();
 
-    void setWeight(double);
-    double getWeight();
+    double & weight();
 private:
     Node* fconnection;
     Node* bconnection;
-    double weight;
+    double val;
 };
 
 #endif
