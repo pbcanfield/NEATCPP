@@ -9,5 +9,4 @@ struct Gene
 	int generation;
 };
 
-#endif 
-
+#endif
