@@ -14,7 +14,7 @@ class Weight
 public:
     // Constructor and destructor
     Weight();
-    Weight(Node *, Node *);
+    Weight(Node *, Node *, double);
     ~Weight();
 
     // Acts as the getter and setter for the weight value
