@@ -11,10 +11,10 @@ Weight::Weight()
 
 }
 
-Weight::Weight(Node * forward, Node * backwards)
+Weight::Weight(Node * forward, Node * backward, double w)
+    : fConnection(forward), bConnection(backward), weight(w)
 {
-    fconnection = forward;
-    bconnection = backwards;
+
 }
 
 Weight::~Weight()
