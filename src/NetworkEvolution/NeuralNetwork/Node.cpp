@@ -1,5 +1,4 @@
 #include "Node.h"
-#include "Weight.h"
 
 // Constructor
 Node::Node()
@@ -16,22 +15,22 @@ Node::~Node()
         delete connection;
 }
 
-void Node::addForward(Node * forward, Node * back)
+void Node::addForward(Node* node)
 {
-    fConnections.push_back(new Weight(forward,back));
+    fConnections.push_back(node));
 }
 
-void Node::addBackwards(Weight * weight)
+void Node::addBackward(Node* node)
 {
-    bConnections.push_back(weight);
+    bConnections.push_back(node);
 }
 
-Weight * Node::getLastForward()
+Node* Node::getLastForward()
 {
     return fConnections.back();
 }
 
-Weight * Node::getLastBackwards()
+Node* Node::getLastBackward()
 {
     return bConnections.back();
 }
