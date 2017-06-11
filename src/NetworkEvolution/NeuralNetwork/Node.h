@@ -7,20 +7,26 @@
 
 class Node
 {
- public:
-  Node();
+public:
+    Node();
+    ~Node();
 
-  void forwardProp();
-  void backwardProp();
-  
-  double sigDeriv();
-  double value();
-  
- private:
-  std::vector<Weight*> fConnections;
-  std::vector<Weight*> bConnections;
+    void forwardProp();
+    void backwardProp();
+    void addForward(Node *, Node *);
+    void addBackwards(Weight *);
 
-  double bias;
+    Weight * getLastForward();
+    Weight * getLastBackwards();
+
+    double sigDeriv();
+    double value();
+
+private:
+    std::vector<Weight*> fConnections;
+    std::vector<Weight*> bConnections;
+
+    double bias;
 
 };
 

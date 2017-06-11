@@ -6,37 +6,73 @@
 
 int main( int argc, char * argv[])
 {
-     Gene cool;
-     cool.inID = 0;
-     cool.outID = 1;
-     cool.weight = 0.6;
-     cool.enabled = true;
-     cool.generation = 0;
+    //This is a test genome that I have wrote to a file for testing.
+    /*
+    Gene gene;
+    Genome code;
+    std::vector<unsigned int> topo {3,2};
+    code.setInput(2);
+    code.setHidden(topo);
+    code.setOutput(2);
 
-     std::vector<unsigned int> topo {3,3};
-
-     Genome test;
-
-     test.setInput(4);
-     test.setHidden(topo);
-     test.setOutput(2);
-     test.addGene(cool);
-
-     cool.inID = 53;
-     cool.outID = 10;
-     cool.weight = 0.9;
-     cool.enabled = false;
-     cool.generation = 100;
-
-     for(unsigned int i = 0; i < 100; ++i)
-          test.addGene(cool);
-
-     test.saveGenome("test.charzar");
-     test.loadFromFile("test.charzar");
-
-     for(unsigned int i = 0; i < test.getGenomeSize(); ++i)
-          std::cout << test.getGene(i).inID << ' ' << test.getGene(i).outID <<
-               ' ' << test.getGene(i).weight << ' '  << test.getGene(i).enabled << ' '  <<
-               test.getGene(i).generation << std::endl;
-     return 0;
+    //-----1-----
+    gene.inID = 0;
+    gene.outID = 2;
+    gene.weight = 0.5;
+    gene.enabled = true;
+    code.addGene(gene);
+    //-----2-----
+    gene.inID = 1;
+    gene.outID = 3;
+    gene.weight = 0.5;
+    gene.enabled = true;
+    code.addGene(gene);
+    //-----3-----
+    gene.inID = 1;
+    gene.outID = 4;
+    gene.weight = 0.5;
+    gene.enabled = true;
+    code.addGene(gene);
+    //-----4-----
+    gene.inID = 2;
+    gene.outID = 5;
+    gene.weight = 0.5;
+    gene.enabled = true;
+    code.addGene(gene);
+    //-----5-----
+    gene.inID = 3;
+    gene.outID = 5;
+    gene.weight = 0.5;
+    gene.enabled = true;
+    code.addGene(gene);
+    //-----6-----
+    gene.inID = 4;
+    gene.outID = 6;
+    gene.weight = 0.5;
+    gene.enabled = true;
+    code.addGene(gene);
+    //-----7-----
+    gene.inID = 5;
+    gene.outID = 7;
+    gene.weight = 0.5;
+    gene.enabled = true;
+    code.addGene(gene);
+    //-----8-----
+    gene.inID = 5;
+    gene.outID = 8;
+    gene.weight = 0.5;
+    gene.enabled = true;
+    code.addGene(gene);
+    //-----9-----
+    gene.inID = 6;
+    gene.outID = 8;
+    gene.weight = 0.5;
+    gene.enabled = true;
+    code.addGene(gene);
+    
+    code.saveGenome("../TestGenome.charzar");
+    */
+    NeuralNetwork testNetwork;
+    testNetwork.loadFromFile("../TestGenome.charzar");
+    return 0;
 }

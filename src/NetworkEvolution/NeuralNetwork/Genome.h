@@ -1,4 +1,5 @@
 #ifndef GENOME_H
+
 #define GENOME_H
 
 #include <vector>
@@ -21,7 +22,9 @@ public:
 
 	void saveGenome(std::string);
 	void loadFromFile(std::string);
+    void copyIntoGenome(Genome &);
 
+    std::vector<Gene> getGenes();
 	Gene getGene(unsigned int);
 	unsigned int getGenomeSize();
 
