@@ -8,7 +8,7 @@ class Weight
 {
 public:
     Weight();
-    Weight(Node *, Node *,double);
+    Weight(Node *, Node *, double = 0);
     ~Weight();
     Node *& fNode() {return fConnection;}
     Node *& bNode() {return bConnection;}
