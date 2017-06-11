@@ -3,7 +3,6 @@
 
 #include "Genome.h"
 #include "Node.h"
-#include "Weight.h"
 #include <vector>
 #include <string>
 
@@ -16,6 +15,7 @@ public:
     ~NeuralNetwork();
 
     void updateStructure();
+    void updateGenome();
     void mutate();
 
     void saveNetwork(std::string);

@@ -4,11 +4,11 @@
  */
 
 #include "Node.h"
-#include "Weight.h"
 
 /* Constructs the node */
 Node::Node()
 {
+
 
 }
 
@@ -17,22 +17,23 @@ Node::Node()
 Node::Node(double v, double b)
     : val(v), bias(b)
 {
-    
+
+
 }
 
-/* Destroys every connection after */ 
+/* Destroys every connection after */
 Node::~Node()
 {
-    for(auto & connection : fConnections)
-        delete connection;
+
+
 }
 
-/* This function takes in a forward node, backward node, and a weight to 
+/* This function takes in a forward node, backward node, and a weight to
  * set the new weight value. This function will create a new weight with
- * all the connections and values, and add the said weight to the back 
+ * all the connections and values, and add the said weight to the back
  * of the fConnections vector.
  */
-void Node::addForward(Node * forward, Node * back, double weight = 0)
+void Node::addForward(Node * forward, Node * back, double weight)
 {
     fConnections.push_back(new Weight(forward, back, weight));
 }
@@ -44,6 +45,7 @@ void Node::addBackwards(Weight * weight)
 {
     bConnections.push_back(weight);
 }
+
 
 /* This function is used to connect up the network.
  * Returns the last connection made forwards.
@@ -62,10 +64,10 @@ Weight * Node::getLastBackwards()
 }
 
 /* This function calculates the value of *this* node based on its many connections.
- * The value of the current node will be changed to the sum of all its connected 
+ * The value of the current node will be changed to the sum of all its connected
  * weights times the weight's connected node values.
  */
-void calculate()
+void Node::calculate()
 {
     double sum;
     for(auto weight : bConnections) {
@@ -75,7 +77,7 @@ void calculate()
 }
 
 /* This function changes the bias. */
-void setBias(double b)
+void Node::setBias(double b)
 {
     bias = b;
 }

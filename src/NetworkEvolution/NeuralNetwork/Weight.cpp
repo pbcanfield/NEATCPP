@@ -1,8 +1,3 @@
-/**
- * Author: Daiwei Chen
- * Date: 2017-6-11
- */
-
 #include "Node.h"
 #include "Weight.h"
 
@@ -23,4 +18,3 @@ Weight::~Weight()
     //delete fconnection;
     //delete bconnection;
 }
-
