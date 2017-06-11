@@ -1,3 +1,8 @@
+/**
+ * Author: Daiwei Chen
+ * Date: 2017-6-10
+ */
+
 #include "Node.h"
 
 // Constructor

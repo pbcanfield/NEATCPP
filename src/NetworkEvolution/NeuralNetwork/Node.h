@@ -1,3 +1,8 @@
+/**
+ * Author: Daiwei Chen
+ * Date: 2017-6-10
+ */
+
 #ifndef NODE_H
 #define NODE_H
 
@@ -24,8 +29,8 @@ public:
 
     // Utility functions
     double const sigDeriv();
-    double& weight(){ return weigh; }
-
+    double& weight() { return weigh; };
+    
 private:
     std::vector<Node*> fConnections;
     std::vector<Node*> bConnections;
