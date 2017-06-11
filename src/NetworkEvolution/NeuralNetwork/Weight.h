@@ -10,7 +10,8 @@ public:
     Weight();
     Weight(Node *, Node *);
     ~Weight();
-
+    Node *& fNode() {return fConnections;}
+    Node *& bNode() {return bConnections;} 
     double & value(){return weight;}
 private:
     Node* fconnection;

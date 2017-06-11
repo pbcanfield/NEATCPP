@@ -12,6 +12,7 @@ class Genome
 public:
 	Genome();
 	void addGene(Gene);
+    void addNode(NodeInfo);
 	void setInput(unsigned int);
 	void setHidden(std::vector<unsigned int>);
 	void setOutput(unsigned int);
@@ -26,7 +27,9 @@ public:
 
     std::vector<Gene> getGenes();
 	Gene getGene(unsigned int);
+    NodeInfo getNode(unsigned int);
 	unsigned int getGenomeSize();
+    unsigned int getNodeInfoSize();
 
 	unsigned int getInput();
 	std::vector<unsigned int> getHidden();
@@ -35,7 +38,7 @@ public:
 private:
 
 	std::vector<Gene> geneticCode;
-
+    std::vector<NodeInfo> nodeCode;
 	unsigned int input;
 	std::vector<unsigned int> hiddenLayer;
 	unsigned int output;

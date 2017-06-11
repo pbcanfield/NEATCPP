@@ -57,8 +57,13 @@ void Genome::saveGenome(std::string dir)
           charizard.write((char*)&layer,sizeof(int));
      charizard.write((char*)&output,sizeof(int));
 
-     for(auto & gene: geneticCode)
+     for(auto & node : nodeCode)
+     {
+         charizard.write((char*)&node.value,sizeof(double));
+         charizard.write((char*)&node.bias,sizeof(double));
+     }
 
+     for(auto & gene: geneticCode)
      {
           charizard.write((char*)&gene.inID,sizeof(int));
           charizard.write((char*)&gene.outID,sizeof(int));
@@ -78,37 +83,64 @@ void Genome::loadFromFile(std::string dir)
 
      if(cry.is_open())
      {
+          unsigned int networkSize = 0;
           unsigned int totalSize;
           cry.read((char*)&totalSize,sizeof(int));
           cry.read((char*)&input,sizeof(int));
+          networkSize += input;
 
           unsigned int layer;
           for(unsigned int i = 0; i < totalSize; ++i)
           {
                cry.read((char*)&layer,sizeof(int));
                hiddenLayer.push_back(layer);
+               networkSize += layer;
           }
 
           cry.read((char*)&output,sizeof(int));
+          networkSize += output;
 
-          Gene temp;
+          NodeInfo nTemp
+          for(unsigned int i = 0 ; i < networkSize; ++i)
+          {
+              cry.read((char*)&nTemp.value,sizeof(double));
+              cry.read((char*)&nTemp.bias,sizeof(double));
+              nodeCode.push_back(nTemp);
+          }
+
+          Gene gTemp;
           while(!cry.eof())
           {
-               cry.read((char*)&temp.inID,sizeof(int));
-               cry.read((char*)&temp.outID,sizeof(int));
-               cry.read((char*)&temp.weight,sizeof(double));
-               cry.read((char*)&temp.enabled,sizeof(bool));
-               cry.read((char*)&temp.generation,sizeof(int));
-               geneticCode.push_back(temp);
+               cry.read((char*)&gTemp.inID,sizeof(int));
+               cry.read((char*)&gTemp.outID,sizeof(int));
+               cry.read((char*)&gTemp.weight,sizeof(double));
+               cry.read((char*)&gTemp.enabled,sizeof(bool));
+               cry.read((char*)&gTemp.generation,sizeof(int));
+               geneticCode.push_back(gTemp);
           }
           geneticCode.pop_back(); // this is a work around and needs to be fixed
+          cry.close();
      }
      else
      {
-          std::cout << "Could not open file " << dir << std::endl;
+          std::cout << "Could not open file \"" << dir << '\"' << std::endl;
      }
 }
 
+void Genome::addNode(NodeInfo info)
+{
+    nodeCode.push_back(info);
+}
+
+NodeInfo Genome::getNode(unsigned int pos)
+{
+    return nodeCode[pos];
+}
+
+unsigned int getNodeInfoSize()
+{
+    return nodeCode.size();
+}
 
 void Genome::copyIntoGenome(Genome & code)
 {

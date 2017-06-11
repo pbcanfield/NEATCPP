@@ -16,6 +16,7 @@ public:
     ~NeuralNetwork();
 
     void updateStructure();
+    void updateGenome();
     void mutate();
 
     void saveNetwork(std::string);

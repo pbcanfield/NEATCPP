@@ -41,42 +41,69 @@ NeuralNetwork::~NeuralNetwork()
 
 void NeuralNetwork::updateStructure()
 {
+
+    //This could potentially be very inefficient.
+    inputs.clear();
+
+    for(auto & vec : hiddenLayer)
+        vec.clear();
+    hiddenLayer.clear();
+
+    outputs.clear();
     //Create the nodes in the network.
     //Create the input layer.
-    for(unsigned int i = 0; i < dna -> getInput(); ++i)
-        inputs.push_back(new Node());
-
+    NodeInfo currentNode;
+    unsigned int alreadyProcessed = dna -> getInput();
+    for(unsigned int i = 0; i < alreadyProcessed; ++i)
+    {
+        currentNode = dna -> getNode(i);
+        inputs.push_back(new Node(currentNode.value,currentNode.bais));
+    }
     //Create the hidden layer.
     std::vector<unsigned int> topo = dna -> getHidden();
     unsigned int size = topo.size();
 
     hiddenLayer.resize(size);
-    for(unsigned int i = 0; i < size; ++i)
-        for(unsigned int j = 0; j < topo[i]; ++j)
-            hiddenLayer[i].push_back(new Node());
 
+    for(unsigned int i = 0; i < size; ++i)
+    {
+        for(unsigned int j = 0; j < topo[i]; ++j)
+        {
+            currentNode = dna -> getNode(alreadyProcessed);
+            hiddenLayer[i].push_back(new Node(currentNode.value,currentNode.bais));
+            ++alreadyProcessed;
+        }
+    }
     //Create the output layer.
     for(unsigned int i = 0; i < dna -> getOutput(); ++i)
-        outputs.push_back(new Node());
-
+    {
+        currentNode = getNode(alreadyProcessed);
+        outputs.push_back(new Node(currentNode.value,currentNode.bais));
+        ++alreadyProcessed;
+    }
     //Connect structure based on the genes in the genome and add the correct weights.
     unsigned int numConnections = dna -> getGenes().size();
     Gene currentGene;
     Node * first;
     Node * last;
-    Weight * weight;
     for(unsigned int i = 0; i < numConnections; ++i)
     {
         currentGene = dna -> getGene(i);
         first = findNodeWithID(currentGene.inID);
         last = findNodeWithID(currentGene.outID);
-        first -> addForward(last,first);
-        weight = first -> getLastForward();
-        weight -> value() = currentGene.weight;
-        last -> addBackwards(weight);
-
+        first -> addForward(last,first,currentGene.weight);
+        last -> addBackwards(first -> getLastForward());
     }
+}
 
+void NeuralNetwork::updateGenome()
+{
+    dna -> setInput(inputs.size());
+    std::vector<unsigned int> topology(hiddenLayer.size());
+    for(auto & vec : hiddenLayer)
+        topology.push_back(vec.size());
+    dna -> setHidden(topology);
+    dna -> setOutput(outputs.size());
 }
 
 void NeuralNetwork::mutate()
@@ -87,6 +114,7 @@ void NeuralNetwork::mutate()
 void NeuralNetwork::saveNetwork(std::string name)
 {
     name += ".charzar"; //maybe dont do it this way
+    updateGenome();
     dna -> saveGenome(name);
 }
 

@@ -9,5 +9,10 @@ struct Gene
 	int generation;
 };
 
-#endif 
+struct NodeInfo
+{
+    double value;
+    double bias;
+};
 
+#endif
