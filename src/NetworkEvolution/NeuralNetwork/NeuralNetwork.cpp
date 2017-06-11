@@ -70,11 +70,9 @@ void NeuralNetwork::updateStructure()
         currentGene = dna -> getGene(i);
         first = findNodeWithID(currentGene.inID);
         last = findNodeWithID(currentGene.outID);
-        first -> addForward(last,first);
-        weight = first -> getLastForward();
-        weight -> weight() = currentGene.weight;
-        last -> addBackwards(weight);
-
+        first -> addForward(last);
+        last -> addBackward(first);
+        last -> weight() = currentGene.weight;
     }
 
 }
