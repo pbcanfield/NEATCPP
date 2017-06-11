@@ -23,7 +23,6 @@ public:
 
 
 private:
-
     Node * findNodeWithID(unsigned int);
 
     std::vector<Node*> inputs;

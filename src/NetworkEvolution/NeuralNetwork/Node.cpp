@@ -1,9 +1,10 @@
 #include "Node.h"
 #include "Weight.h"
 
+// Constructor
 Node::Node()
 {
-
+    
 }
 
 Node::~Node()
