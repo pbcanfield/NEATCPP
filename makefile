@@ -1,5 +1,5 @@
-NEAT:	NetworkManager.o Genome.o NeuralNetwork.o Node.o Weight.o main.o
-	g++ -Wall -g -std=c++14 -pthread obj/Genome.o obj/Node.o obj/NeuralNetwork.o obj/NetworkManager.o obj/Weight.o  obj/main.o -o exec/NEAT
+NEAT:	NetworkManager.o Genome.o NeuralNetwork.o Node.o main.o
+	g++ -Wall -g -std=c++14 -pthread obj/Genome.o obj/Node.o obj/NeuralNetwork.o obj/NetworkManager.o  obj/main.o -o exec/NEAT
 
 main.o:	src/main.cpp
 	g++ -Wall -g -std=c++14 -pthread -c src/main.cpp -o obj/main.o
@@ -15,9 +15,6 @@ NeuralNetwork.o:	src/NetworkEvolution/NeuralNetwork/NeuralNetwork.cpp src/Networ
 
 Node.o:	src/NetworkEvolution/NeuralNetwork/Node.cpp src/NetworkEvolution/NeuralNetwork/Node.h
 	g++ -Wall -g -std=c++14 -pthread -c src/NetworkEvolution/NeuralNetwork/Node.cpp -o obj/Node.o
-
-Weight.o:	src/NetworkEvolution/NeuralNetwork/Weight.cpp src/NetworkEvolution/NeuralNetwork/Weight.h
-	g++ -Wall -g -std=c++14 -pthread -c src/NetworkEvolution/NeuralNetwork/Weight.cpp -o obj/Weight.o
 
 clean:
 	rm -rf obj/* exec/*

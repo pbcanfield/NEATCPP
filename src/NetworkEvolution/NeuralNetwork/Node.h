@@ -15,22 +15,22 @@ public:
     void backwardProp();
 
     // Modifying the network
-    void removeFConnections();
-    void removeBConnections();
-    void addForward(Node *, Node *);
-    void addBackwards(Weight *);
+    void addForward(Node*);
+    void addBackward(Node*);
 
-    // Getter
-    Weight * getLastForward();
-    Weight * getLastBackwards();
+    // Getters
+    Node* getLastForward();
+    Node* getLastBackward();
     
     // Utility functions
     double const sigDeriv();
-
+    double& weight();
+    
 private:
-    std::vector<Weight*> fConnections;
-    std::vector<Weight*> bConnections;
+    std::vector<Node*> fConnections;
+    std::vector<Node*> bConnections;
 
+    double weight;
     double bias = 0;
 
 };
