@@ -1,10 +1,6 @@
 /**
  * Author: Daiwei Chen
-<<<<<<< HEAD
- * Date: 2017-6-10
-=======
  * Date: 2017-6-11
->>>>>>> 79db036014b8bb12af0064f852e3106b33dc8e8c
  */
 
 #ifndef NODE_H
@@ -28,7 +24,7 @@ public:
     // Modifying the network
     void removeFConnections();
     void removeBConnections();
-    void addForward(Node *, Node *, double);
+    void addForward(Node *, Node *, double=0);
     void addBackwards(Weight *);
     void setBias(double);
 

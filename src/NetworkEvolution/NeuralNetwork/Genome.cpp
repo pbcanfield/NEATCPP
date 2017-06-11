@@ -100,7 +100,7 @@ void Genome::loadFromFile(std::string dir)
           cry.read((char*)&output,sizeof(int));
           networkSize += output;
 
-          NodeInfo nTemp
+          NodeInfo nTemp;
           for(unsigned int i = 0 ; i < networkSize; ++i)
           {
               cry.read((char*)&nTemp.value,sizeof(double));
@@ -137,7 +137,7 @@ NodeInfo Genome::getNode(unsigned int pos)
     return nodeCode[pos];
 }
 
-unsigned int getNodeInfoSize()
+unsigned int Genome::getNodeInfoSize()
 {
     return nodeCode.size();
 }

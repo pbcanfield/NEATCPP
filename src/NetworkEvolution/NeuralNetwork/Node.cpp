@@ -33,7 +33,7 @@ Node::~Node()
  * all the connections and values, and add the said weight to the back
  * of the fConnections vector.
  */
-void Node::addForward(Node * forward, Node * back, double weight = 0)
+void Node::addForward(Node * forward, Node * back, double weight)
 {
     fConnections.push_back(new Weight(forward, back, weight));
 }
@@ -43,7 +43,7 @@ void Node::addForward(Node * forward, Node * back, double weight = 0)
  */
 void Node::addBackwards(Weight * weight)
 {
-    bConnections.push_back(node);
+    bConnections.push_back(weight);
 }
 
 
@@ -67,7 +67,7 @@ Weight * Node::getLastBackwards()
  * The value of the current node will be changed to the sum of all its connected
  * weights times the weight's connected node values.
  */
-void calculate()
+void Node::calculate()
 {
     double sum;
     for(auto weight : bConnections) {
@@ -77,7 +77,7 @@ void calculate()
 }
 
 /* This function changes the bias. */
-void setBias(double b)
+void Node::setBias(double b)
 {
     bias = b;
 }
