@@ -4,15 +4,12 @@
 // Constructor
 Node::Node()
 {
-    
+
 }
 
 Node::~Node()
 {
     for(auto & connection : fConnections)
-        delete connection;
-
-    for(auto & connection : bConnections)
         delete connection;
 }
 

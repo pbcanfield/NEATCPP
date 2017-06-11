@@ -3,13 +3,14 @@
 
 #include <vector>
 #include <iostream>
+#include "Weight.h"
 
 class Node
 {
 public:
     Node();
     ~Node();
-  
+
     // Calculating and Learning
     double const value();
     void backwardProp();
@@ -23,7 +24,7 @@ public:
     // Getter
     Weight * getLastForward();
     Weight * getLastBackwards();
-    
+
     // Utility functions
     double const sigDeriv();
 

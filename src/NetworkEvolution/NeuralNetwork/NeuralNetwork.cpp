@@ -72,7 +72,7 @@ void NeuralNetwork::updateStructure()
         last = findNodeWithID(currentGene.outID);
         first -> addForward(last,first);
         weight = first -> getLastForward();
-        weight -> weight() = currentGene.weight;
+        weight -> value() = currentGene.weight;
         last -> addBackwards(weight);
 
     }
