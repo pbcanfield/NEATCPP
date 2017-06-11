@@ -3,7 +3,6 @@
 
 #include "Genome.h"
 #include "Node.h"
-#include "Weight.h"
 #include <vector>
 #include <string>
 
