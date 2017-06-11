@@ -64,7 +64,6 @@ void NeuralNetwork::updateStructure()
     Gene currentGene;
     Node * first;
     Node * last;
-    Weight * weight;
     for(unsigned int i = 0; i < numConnections; ++i)
     {
         currentGene = dna -> getGene(i);

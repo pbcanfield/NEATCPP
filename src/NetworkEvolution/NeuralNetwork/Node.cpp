@@ -1,3 +1,8 @@
+/**
+ * Author: Daiwei Chen
+ * Date: 2017-6-10
+ */
+
 #include "Node.h"
 
 // Constructor
@@ -17,7 +22,7 @@ Node::~Node()
 
 void Node::addForward(Node* node)
 {
-    fConnections.push_back(node));
+    fConnections.push_back(node);
 }
 
 void Node::addBackward(Node* node)
