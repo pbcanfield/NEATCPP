@@ -9,7 +9,7 @@ class Node
 public:
     Node();
     ~Node();
-  
+
     // Calculating and Learning
     double const value();
     void backwardProp();
@@ -21,16 +21,16 @@ public:
     // Getters
     Node* getLastForward();
     Node* getLastBackward();
-    
+
     // Utility functions
     double const sigDeriv();
-    double& weight();
-    
+    double& weight(){ return weigh; }
+
 private:
     std::vector<Node*> fConnections;
     std::vector<Node*> bConnections;
 
-    double weight;
+    double weigh;
     double bias = 0;
 
 };
