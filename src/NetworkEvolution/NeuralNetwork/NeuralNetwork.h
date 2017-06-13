@@ -30,12 +30,6 @@ private:
     Genome * dna;
 
     unsigned int generation;
-
-    Genome * instructions;
-
-    std::vector<Node*> input;
-    std::vector<std::vector<Node*>> hiddenLayer;
-    std::vector<Node*> output;
 };
 
 #endif
