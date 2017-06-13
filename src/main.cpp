@@ -8,14 +8,41 @@ int main( int argc, char * argv[])
 {
 
     //This is a test genome that I have wrote to a file for testing.
-    /*
+
     Gene gene;
+    NodeInfo node;
     Genome code;
     std::vector<unsigned int> topo {3,2};
     code.setInput(2);
     code.setHidden(topo);
     code.setOutput(2);
-
+    node.value = 0;
+    node.bias = 0;
+    code.addNode(node);
+    node.value = 0;
+    node.bias = 0;
+    code.addNode(node);
+    node.value = 0;
+    node.bias = 0;
+    code.addNode(node);
+    node.value = 0;
+    node.bias = 0;
+    code.addNode(node);
+    node.value = 0;
+    node.bias = 0;
+    code.addNode(node);
+    node.value = 0;
+    node.bias = 0;
+    code.addNode(node);
+    node.value = 0;
+    node.bias = 0;
+    code.addNode(node);
+    node.value = 0;
+    node.bias = 0;
+    code.addNode(node);
+    node.value = 0;
+    node.bias = 0;
+    code.addNode(node);
     //-----1-----
     gene.inID = 0;
     gene.outID = 2;
@@ -70,9 +97,9 @@ int main( int argc, char * argv[])
     gene.weight = 0.5;
     gene.enabled = true;
     code.addGene(gene);
-    
+
     code.saveGenome("../TestGenome.charzar");
-    */
+
     NeuralNetwork testNetwork;
     testNetwork.loadFromFile("../TestGenome.charzar");
     return 0;
