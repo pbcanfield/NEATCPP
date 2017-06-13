@@ -4,31 +4,38 @@
 #include "Genome.h"
 #include "Node.h"
 #include <vector>
-#include <thread>
 #include <string>
-
 
 class NeuralNetwork
 {
 public:
-     NeuralNetwork();
-     NeuralNetwork(std::string);
-     ~NeuralNetwork();
-     void updateStructure();
-     void loadFromFile(std::string);
-     void saveNetwork(std::string);
+    NeuralNetwork();
+    NeuralNetwork(std::string);
+    NeuralNetwork(Genome);
+    ~NeuralNetwork();
 
-     void runForward();
+    void updateStructure();
+    void updateGenome();
+    void mutate();
 
-     void batchGradientDescent(double);
+    void saveNetwork(std::string);
+    void loadFromFile(std::string);
 
 private:
+    Node * findNodeWithID(unsigned int);
 
-     Genome * instructions;
+    std::vector<Node*> inputs;
+    std::vector<std::vector<Node*>> hiddenLayer;
+    std::vector<Node*> outputs;
+    Genome * dna;
 
-     std::vector<Node*> input;
-     std::vector<std::vector<Node*>> hiddenLayer;
-     std::vector<Node*> output;
+    unsigned int generation;
+
+    Genome * instructions;
+
+    std::vector<Node*> input;
+    std::vector<std::vector<Node*>> hiddenLayer;
+    std::vector<Node*> output;
 };
 
 #endif

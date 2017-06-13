@@ -20,4 +20,4 @@ Weight.o:	src/NetworkEvolution/NeuralNetwork/Weight.cpp src/NetworkEvolution/Neu
 	g++ -Wall -g -std=c++14 -pthread -c src/NetworkEvolution/NeuralNetwork/Weight.cpp -o obj/Weight.o
 
 clean:
-	rm obj/NetworkManager.o obj/Genome.o obj/NeuralNetwork.o obj/Node.o exec/NEAT
+	rm -rf obj/* exec/*
