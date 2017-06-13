@@ -21,7 +21,6 @@ public:
     void saveNetwork(std::string);
     void loadFromFile(std::string);
 
-
 private:
     Node * findNodeWithID(unsigned int);
 
@@ -31,7 +30,6 @@ private:
     Genome * dna;
 
     unsigned int generation;
-
 };
 
 #endif

@@ -6,6 +6,7 @@
 
 int main( int argc, char * argv[])
 {
+
     //This is a test genome that I have wrote to a file for testing.
     /*
     Gene gene;

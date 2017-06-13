@@ -11,6 +11,7 @@ class Genome
 {
 public:
 	Genome();
+	Genome(std::string);
 	void addGene(Gene);
     void addNode(NodeInfo);
 	void setInput(unsigned int);
