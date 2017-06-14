@@ -96,25 +96,75 @@ void NeuralNetwork::updateStructure()
     }
 }
 
-void NeuralNetwork::updateGenome()
-{
-    dna -> setInput(inputs.size());
-    std::vector<unsigned int> topology(hiddenLayer.size());
-    for(auto & vec : hiddenLayer)
-        topology.push_back(vec.size());
-    dna -> setHidden(topology);
-    dna -> setOutput(outputs.size());
-}
 
 void NeuralNetwork::mutate()
 {
 
 }
 
+void NeuralNetwork::runForward(unsigned int numThreads)
+{
+    layerProcessed = 1; //start at the first hidden layer.
+
+    //This is where the multithreading starts.
+    for(unsigned int i = 0; i < numThreads; ++i)
+    {
+        threads.push_back(new std::thread(processForward,i));
+        completed.push_back(false);
+    }
+
+    // It should be +2 but im saving a computation because
+    // 1 will be subtracted later.
+    unsigned int totalLayers = hiddenLayer.size() + 1;
+    unsigned int checkNum = 0;
+    bool mainComplete = false;
+
+    unsigned int rem;
+    while(layerProcessed != totalLayers)
+    {
+        if(!mainComplete)
+        {
+            unsigned int nLayer = findNumInLayer(layerProcessed);
+            rem = nLayer & numThreads;
+            if(rem == 0)
+                mainComplete = true;
+            else
+            {
+                std::vector<Node*> & currentLayer = getLayer(layerProcessed);
+                for(unsigned int i = nLayer - rem; i < nLayer; ++i)
+                    currentLayer[i] -> calculate();
+
+            }
+        }
+        //check if every thread has completed;
+        for(auto status : completed)
+            if(status)
+                ++checkNum;
+
+        if(checkNum == numThreads)
+        {
+            checkNum = 0;
+            for(unsigned int i = 0; i < completed.size(); ++i)
+                completed[i] = false;
+            mainComplete = false;
+            ++layerProcessed;
+        }
+
+
+    }
+
+
+    for(auto & thread : threads)
+    {
+        thread -> join();
+        delete thread;
+    }
+
+}
+
 void NeuralNetwork::saveNetwork(std::string name)
 {
     name += ".charzar"; //maybe dont do it this way
-    updateGenome();
     dna -> saveGenome(name);
 }
 
@@ -152,10 +202,36 @@ Node * NeuralNetwork::findNodeWithID(unsigned int ID)
             }
         }
     }
-    else
-    {
-        ID -= inputs.size() + hiddenLayerSize;
-        return outputs[ID];
-    }
-    return NULL; //If this works this will never execute.
+
+    ID -= inputs.size() + hiddenLayerSize;
+    return outputs[ID];
+
+
+}
+
+void NeuralNetwork::processForward(unsigned int ID)
+{
+
+}
+
+unsigned int NeuralNetwork::findNumInLayer(unsigned int layer)
+{
+    unsigned int nLayer = outputs.size();
+    if (layer == 0)
+        nLayer = inputs.size();
+    else if(layer <= hiddenLayer.size())
+        nLayer = hiddenLayer[layer - 1].size();
+
+    return nLayer;
+
+}
+
+std::vector<Node*> & NeuralNetwork::getLayer(unsigned int pos)
+{
+    if (pos == 0)
+        return inputs;
+    else if (pos <= hiddenLayer.size())
+        return hiddenLayer[pos - 1];
+
+    return outputs;
 }

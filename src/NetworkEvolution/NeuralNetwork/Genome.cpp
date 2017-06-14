@@ -153,6 +153,7 @@ void Genome::copyIntoGenome(Genome & code)
     input = code.getInput();
     hiddenLayer = code.getHidden();
     output = code.getOutput();
+
 }
 
 std::vector<Gene> Genome::getGenes()
