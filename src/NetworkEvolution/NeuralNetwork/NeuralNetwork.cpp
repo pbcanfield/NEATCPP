@@ -1,11 +1,20 @@
 #include "NeuralNetwork.h"
 
+/**
+ * This is the defualt constructor that sets thegeneration to zero
+ * and allocates the memory for the genome of this Neural Network.
+ */
 NeuralNetwork::NeuralNetwork()
 {
     generation = 0;
     dna = new Genome();
 }
 
+/**
+ * This is a constructor that takes a string that will automatically
+ * load the genome from a specified charzar file and updates structure
+ * accordingly.
+ */
 NeuralNetwork::NeuralNetwork(std::string dir)
 {
     dna = new Genome();
@@ -16,6 +25,11 @@ NeuralNetwork::NeuralNetwork(std::string dir)
 
 }
 
+
+/**
+ * This is a constructor that takes a genome and copies that genome
+ * into this networks genome and updates the structure accordingly.
+ */
 NeuralNetwork::NeuralNetwork(Genome code)
 {
     dna = new Genome();
@@ -24,6 +38,10 @@ NeuralNetwork::NeuralNetwork(Genome code)
     updateStructure();
 }
 
+/**
+ * This destructor deallocates all the input, hidden and output
+ * memory that was allocated for the network.
+ */
 NeuralNetwork::~NeuralNetwork()
 {
     delete dna;
@@ -38,6 +56,12 @@ NeuralNetwork::~NeuralNetwork()
     for(auto & node : outputs)
         delete node;
 }
+
+/**
+ * This is a member function that is responisble for analyzing
+ * the structure of the genome and for emmulating that structure
+ * in the neural network.
+ */
 
 void NeuralNetwork::updateStructure()
 {
@@ -102,6 +126,11 @@ void NeuralNetwork::mutate()
 
 }
 
+/**
+ * This is the function that is responisble for handling
+ * the multithreading that runs the forward propgation
+ * for the neural network.
+ */
 void NeuralNetwork::runForward(unsigned int numThreads)
 {
     layerProcessed = 1; //start at the first hidden layer.
@@ -162,12 +191,24 @@ void NeuralNetwork::runForward(unsigned int numThreads)
 
 }
 
+/**
+ * This function saves the current genome to a charzar file.
+ * It takes a string that is the directory of the file and the
+ * charzar extension is automatically attatched to the file.
+ */
 void NeuralNetwork::saveNetwork(std::string name)
 {
     name += ".charzar"; //maybe dont do it this way
     dna -> saveGenome(name);
 }
 
+
+/**
+ * This is a function that loads a neural network from a file into memory.
+ * It takes a string to the directory where the genome is saved and then
+ * runs the updateStructure function which updates the struncture of the
+ * Neural Network.
+ */
 void NeuralNetwork::loadFromFile(std::string dir)
 {
     dna -> loadFromFile(dir);
@@ -175,7 +216,12 @@ void NeuralNetwork::loadFromFile(std::string dir)
 }
 
 
-//There is a better way to write this code;
+/**
+ * This is a function that takes a linear identification number and searches
+ * the non-linear network structure for the corrisponding node.
+ * It takes an unsigned in wich is an ID and returns a node pointer
+ * which is the pointer to that specific node in the network structure.
+ */
 Node * NeuralNetwork::findNodeWithID(unsigned int ID)
 {
     //calculates the size of the hiddenLayer.
@@ -209,23 +255,38 @@ Node * NeuralNetwork::findNodeWithID(unsigned int ID)
 
 }
 
+
+/**
+ * This is a function that takes a thread Id and then calculates and runs the specific
+ * forward propogation calculations that are neccissary for that thread to complete for
+ * the specific layer. The layer that is currently being processed is managed by the
+ * main thread in the runForward function.
+ * It takes an unsinged int as an input which represents which thread is running this function.
+ */
 void NeuralNetwork::processForward(unsigned int ID)
 {
 
 }
 
+
+/**
+ * This is a fiunction that gets the total number of nodes in a specific layer of the
+ * Neural Network.
+ * It takes in a unsigned int that represents the layer number and returns
+ * an unsigned int which is the total number of nodes in that layer.
+ */
 unsigned int NeuralNetwork::findNumInLayer(unsigned int layer)
 {
-    unsigned int nLayer = outputs.size();
-    if (layer == 0)
-        nLayer = inputs.size();
-    else if(layer <= hiddenLayer.size())
-        nLayer = hiddenLayer[layer - 1].size();
-
-    return nLayer;
-
+    return getLayer(layer).size();
 }
 
+/**
+ * This is a function that returns a layer at a specific position in the
+ * Neural Network.
+ * It takes a unsigned int which represents the position of the layer
+ * in the Neural Network and returns a vector of node pointers
+ * which are pointers to nodes in that specific layer.
+ */
 std::vector<Node*> & NeuralNetwork::getLayer(unsigned int pos)
 {
     if (pos == 0)

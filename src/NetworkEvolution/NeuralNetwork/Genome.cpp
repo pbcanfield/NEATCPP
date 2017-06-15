@@ -1,6 +1,9 @@
 #include "Genome.h"
 #include <iostream>
-
+/**
+ * Author: Pete Canfield & Daiwei Chen
+ * Date: 2017-6-15
+ */
 
 Genome::Genome()
 {
