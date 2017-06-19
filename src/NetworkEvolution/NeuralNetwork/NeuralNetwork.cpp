@@ -76,12 +76,12 @@ void NeuralNetwork::updateStructure()
     outputs.clear();
     //Create the nodes in the network.
     //Create the input layer.
-    NodeInfo currentNode;
+    double currentNode;
     unsigned int alreadyProcessed = dna -> getInput();
     for(unsigned int i = 0; i < alreadyProcessed; ++i)
     {
-        currentNode = dna -> getNode(i);
-        inputs.push_back(new Node(currentNode.value,currentNode.bias));
+        currentNode = dna -> getBias(i);
+        inputs.push_back(new Node(currentNode));
     }
     //Create the hidden layer.
     std::vector<unsigned int> topo = dna -> getHidden();
@@ -93,16 +93,16 @@ void NeuralNetwork::updateStructure()
     {
         for(unsigned int j = 0; j < topo[i]; ++j)
         {
-            currentNode = dna -> getNode(alreadyProcessed);
-            hiddenLayer[i].push_back(new Node(currentNode.value,currentNode.bias));
+            currentNode = dna -> getBias(alreadyProcessed);
+            hiddenLayer[i].push_back(new Node(currentNode));
             ++alreadyProcessed;
         }
     }
     //Create the output layer.
     for(unsigned int i = 0; i < dna -> getOutput(); ++i)
     {
-        currentNode = dna -> getNode(alreadyProcessed);
-        outputs.push_back(new Node(currentNode.value,currentNode.bias));
+        currentNode = dna -> getBias(alreadyProcessed);
+        outputs.push_back(new Node(currentNode));
         ++alreadyProcessed;
     }
     //Connect structure based on the genes in the genome and add the correct weights.

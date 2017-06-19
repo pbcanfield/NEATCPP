@@ -65,11 +65,8 @@ void Genome::saveGenome(std::string dir)
           charizard.write((char*)&layer,sizeof(int));
      charizard.write((char*)&output,sizeof(int));
 
-     for(auto & node : nodeCode)
-     {
-         charizard.write((char*)&node.value,sizeof(double));
-         charizard.write((char*)&node.bias,sizeof(double));
-     }
+     for(auto & bias : biasInfo)
+         charizard.write((char*)&bias,sizeof(double));
 
      for(auto & gene: geneticCode)
      {
@@ -87,6 +84,7 @@ void Genome::loadFromFile(std::string dir)
 {
      hiddenLayer.clear();
      geneticCode.clear();
+     biasInfo.clear();
      std::ifstream cry(dir, std::ios::binary);
 
      if(cry.is_open())
@@ -108,13 +106,10 @@ void Genome::loadFromFile(std::string dir)
           cry.read((char*)&output,sizeof(int));
           networkSize += output;
 
-          NodeInfo nTemp;
+          double bTemp;
           for(unsigned int i = 0 ; i < networkSize; ++i)
-          {
-              cry.read((char*)&nTemp.value,sizeof(double));
-              cry.read((char*)&nTemp.bias,sizeof(double));
-              nodeCode.push_back(nTemp);
-          }
+              cry.read((char*)&bTemp,sizeof(double));
+              biasInfo.push_back(bTemp);
 
           Gene gTemp;
           while(!cry.eof())
@@ -135,24 +130,25 @@ void Genome::loadFromFile(std::string dir)
      }
 }
 
-void Genome::addNode(NodeInfo info)
+void Genome::addBias(double info)
 {
-    nodeCode.push_back(info);
+    biasInfo.push_back(info);
 }
 
-NodeInfo Genome::getNode(unsigned int pos)
+double Genome::getBias(unsigned int pos)
 {
-    return nodeCode[pos];
+    return biasInfo[pos];
 }
 
-unsigned int Genome::getNodeInfoSize()
+unsigned int Genome::getBiasSize()
 {
-    return nodeCode.size();
+    return biasInfo.size();
 }
 
 void Genome::copyIntoGenome(Genome & code)
 {
     geneticCode = code.getGenes();
+    biasInfo = code.getBiasVector();
     input = code.getInput();
     hiddenLayer = code.getHidden();
     output = code.getOutput();
@@ -162,6 +158,11 @@ void Genome::copyIntoGenome(Genome & code)
 std::vector<Gene> Genome::getGenes()
 {
     return geneticCode;
+}
+
+std::vector<double> Genome::getBiasVector()
+{
+    return biasInfo;
 }
 
 Gene Genome::getGene(unsigned int pos)

@@ -15,7 +15,7 @@ class Node
 public:
     // Constructor and Destructor
     Node();
-    Node(double, double);
+    Node(double);
     ~Node();
 
     // Calculating and Learning

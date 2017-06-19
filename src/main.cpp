@@ -10,39 +10,23 @@ int main( int argc, char * argv[])
     //This is a test genome that I have wrote to a file for testing.
 
     Gene gene;
-    NodeInfo node;
+    double b;
     Genome code;
     std::vector<unsigned int> topo {3,2};
     code.setInput(2);
     code.setHidden(topo);
     code.setOutput(2);
-    node.value = 0;
-    node.bias = 0;
-    code.addNode(node);
-    node.value = 0;
-    node.bias = 0;
-    code.addNode(node);
-    node.value = 0;
-    node.bias = 0;
-    code.addNode(node);
-    node.value = 0;
-    node.bias = 0;
-    code.addNode(node);
-    node.value = 0;
-    node.bias = 0;
-    code.addNode(node);
-    node.value = 0;
-    node.bias = 0;
-    code.addNode(node);
-    node.value = 0;
-    node.bias = 0;
-    code.addNode(node);
-    node.value = 0;
-    node.bias = 0;
-    code.addNode(node);
-    node.value = 0;
-    node.bias = 0;
-    code.addNode(node);
+
+    b = 0.5;
+    code.addBias(b);
+    code.addBias(b);
+    code.addBias(b);
+    code.addBias(b);
+    code.addBias(b);
+    code.addBias(b);
+    code.addBias(b);
+    code.addBias(b);
+    code.addBias(b);
     //-----1-----
     gene.inID = 0;
     gene.outID = 2;

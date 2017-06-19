@@ -8,11 +8,4 @@ struct Gene
 	bool enabled;
 	int generation;
 };
-
-struct NodeInfo
-{
-    double value;
-    double bias;
-};
-
 #endif

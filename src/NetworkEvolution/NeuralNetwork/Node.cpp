@@ -14,11 +14,9 @@ Node::Node()
 
 /* Constructs a node that pre-sets the value and the bias,
  * otherwise, both values will be 0 */
-Node::Node(double v, double b)
-    : val(v), bias(b)
+Node::Node(double b)
 {
-
-
+    bias = b;
 }
 
 /* Destroys every connection after */
