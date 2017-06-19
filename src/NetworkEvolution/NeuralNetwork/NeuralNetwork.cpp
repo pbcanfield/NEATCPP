@@ -138,7 +138,7 @@ void NeuralNetwork::runForward(unsigned int numThreads)
     //This is where the multithreading starts.
     for(unsigned int i = 0; i < numThreads; ++i)
     {
-        threads.push_back(new std::thread(processForward,i));
+        threads.push_back(new std::thread(&NeuralNetwork::processForward,this,i));
         completed.push_back(false);
     }
 
@@ -265,7 +265,32 @@ Node * NeuralNetwork::findNodeWithID(unsigned int ID)
  */
 void NeuralNetwork::processForward(unsigned int ID)
 {
+    unsigned int workload, numInLayer, numThreads, threadCount;
+    unsigned int totalLayers = hiddenLayer.size() + 1;
+    std::vector<Node*> layer;
+    numThreads = threads.size();
+    bool complete;
 
+
+    while(layerProcessed != totalLayers)
+    {
+        layer = getLayer(layerProcessed);
+        numInLayer = findNumInLayer(layerProcessed);
+        workload = ((numInLayer - ( numInLayer % numThreads)) / numThreads) + ID;
+        for(unsigned int i = ID; i < workload; ++i)
+            layer[i] -> calculate();
+
+        threadCount = 0;
+        complete = false;
+        while(!complete)
+        {
+            for(unsigned int i = 0; i < completed.size(); ++i)
+                if(completed[i])
+                    ++threadCount;
+            if(threadCount == numThreads)
+                complete = true;
+        }
+    }
 }
 
 

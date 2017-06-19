@@ -25,7 +25,7 @@ public:
 
 private:
     Node * findNodeWithID(unsigned int);
-    static void processForward(unsigned int);
+    void processForward(unsigned int);
     unsigned int findNumInLayer(unsigned int);
     std::vector<Node*> & getLayer(unsigned int);
 
