@@ -135,16 +135,18 @@ void NeuralNetwork::runForward(unsigned int numThreads)
 {
     layerProcessed = 1; //start at the first hidden layer.
 
+    //Initialize the completed vector to false;
+    for(unsigned int i = 0 ; i < numThreads; ++i)
+        completed.push_back(false);
+
     //This is where the multithreading starts.
     for(unsigned int i = 0; i < numThreads; ++i)
-    {
-        threads.push_back(new std::thread(&NeuralNetwork::processForward,this,i));
-        completed.push_back(false);
-    }
+        threads.push_back(new std::thread(&NeuralNetwork::processForward,this,i,numThreads));
+
 
     // It should be +2 but im saving a computation because
     // 1 will be subtracted later.
-    unsigned int totalLayers = hiddenLayer.size() + 1;
+    unsigned int totalLayers = hiddenLayer.size() + 2;
     unsigned int checkNum = 0;
     bool mainComplete = false;
 
@@ -154,25 +156,25 @@ void NeuralNetwork::runForward(unsigned int numThreads)
         if(!mainComplete)
         {
             unsigned int nLayer = findNumInLayer(layerProcessed);
-            rem = nLayer & numThreads;
-            if(rem == 0)
-                mainComplete = true;
-            else
+            rem = nLayer % numThreads;
+            if(rem != 0)
             {
                 std::vector<Node*> & currentLayer = getLayer(layerProcessed);
                 for(unsigned int i = nLayer - rem; i < nLayer; ++i)
                     currentLayer[i] -> calculate();
-
             }
+            mainComplete = true;
         }
+
         //check if every thread has completed;
+        checkNum = 0;
         for(auto status : completed)
             if(status)
                 ++checkNum;
 
         if(checkNum == numThreads)
         {
-            checkNum = 0;
+
             for(unsigned int i = 0; i < completed.size(); ++i)
                 completed[i] = false;
             mainComplete = false;
@@ -263,12 +265,11 @@ Node * NeuralNetwork::findNodeWithID(unsigned int ID)
  * main thread in the runForward function.
  * It takes an unsinged int as an input which represents which thread is running this function.
  */
-void NeuralNetwork::processForward(unsigned int ID)
+void NeuralNetwork::processForward(unsigned int ID, unsigned int numThreads)
 {
-    unsigned int workload, numInLayer, numThreads, threadCount;
-    unsigned int totalLayers = hiddenLayer.size() + 1;
+    unsigned int workload, numInLayer;
+    unsigned int totalLayers = hiddenLayer.size() + 2;
     std::vector<Node*> layer;
-    numThreads = threads.size();
     bool complete;
 
 
@@ -280,14 +281,11 @@ void NeuralNetwork::processForward(unsigned int ID)
         for(unsigned int i = ID; i < workload; ++i)
             layer[i] -> calculate();
 
-        threadCount = 0;
+        completed[ID] = true;
         complete = false;
-        while(!complete)
+        while(!complete && layerProcessed != totalLayers)
         {
-            for(unsigned int i = 0; i < completed.size(); ++i)
-                if(completed[i])
-                    ++threadCount;
-            if(threadCount == numThreads)
+            if(!completed[ID])
                 complete = true;
         }
     }

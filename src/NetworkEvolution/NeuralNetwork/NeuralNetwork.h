@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include <thread>
+#include <atomic>
 
 class NeuralNetwork
 {
@@ -25,7 +26,7 @@ public:
 
 private:
     Node * findNodeWithID(unsigned int);
-    void processForward(unsigned int);
+    void processForward(unsigned int,unsigned int);
     unsigned int findNumInLayer(unsigned int);
     std::vector<Node*> & getLayer(unsigned int);
 
@@ -39,7 +40,7 @@ private:
     //multithreading
     std::vector<std::thread*> threads;
     std::vector<bool> completed;
-    unsigned int layerProcessed;
+    std::atomic<unsigned int> layerProcessed;
 };
 
 #endif

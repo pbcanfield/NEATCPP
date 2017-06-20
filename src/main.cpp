@@ -86,6 +86,6 @@ int main( int argc, char * argv[])
 
     NeuralNetwork testNetwork;
     testNetwork.loadFromFile("../TestGenome.charzar");
-    testNetwork.runForward(4);
+    testNetwork.runForward(2);
     return 0;
 }
