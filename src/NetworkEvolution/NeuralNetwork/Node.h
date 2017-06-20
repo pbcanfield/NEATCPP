@@ -31,7 +31,7 @@ public:
     // Getter
     Weight * getLastForward();
     Weight * getLastBackwards();
-    double const value() { return val; };
+    double & value() { return val; };
 
 
 private:

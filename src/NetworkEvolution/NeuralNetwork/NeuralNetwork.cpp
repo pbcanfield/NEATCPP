@@ -126,6 +126,21 @@ void NeuralNetwork::mutate()
 
 }
 
+void NeuralNetwork::setInputs(std::vector<double> input)
+{
+    if(input.size() != inputs.size())
+    {
+        std::cout << "Could not set inputs becuase the input set was not the correct length"
+            << std::endl;
+    }
+    else
+    {
+        for(unsigned int i = 0; i < input.size(); ++i)
+            inputs[i] -> value() = input[i];
+
+    }
+}
+
 /**
  * This is the function that is responisble for handling
  * the multithreading that runs the forward propgation
@@ -215,6 +230,16 @@ void NeuralNetwork::loadFromFile(std::string dir)
 {
     dna -> loadFromFile(dir);
     updateStructure();
+}
+
+
+std::vector<double> NeuralNetwork::getNetworkOutput()
+{
+    std::vector<double> value;
+    for(auto & node : outputs)
+        value.push_back(node -> value());
+
+    return value;
 }
 
 

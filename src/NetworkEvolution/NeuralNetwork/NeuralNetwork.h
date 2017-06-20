@@ -19,10 +19,12 @@ public:
     void updateStructure();
     void mutate();
 
+    void setInputs(std::vector<double>);
     void runForward(unsigned int=0);
 
     void saveNetwork(std::string);
     void loadFromFile(std::string);
+    std::vector<double> getNetworkOutput();
 
 private:
     Node * findNodeWithID(unsigned int);

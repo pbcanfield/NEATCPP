@@ -22,8 +22,8 @@ Node::Node(double b)
 /* Destroys every connection after */
 Node::~Node()
 {
-
-
+    for(auto & weight : fConnections)
+        delete weight;
 }
 
 /* This function takes in a forward node, backward node, and a weight to

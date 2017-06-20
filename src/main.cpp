@@ -17,7 +17,7 @@ int main( int argc, char * argv[])
     code.setHidden(topo);
     code.setOutput(2);
 
-    b = 0.5;
+    b = 1;
     code.addBias(b);
     code.addBias(b);
     code.addBias(b);
@@ -30,55 +30,55 @@ int main( int argc, char * argv[])
     //-----1-----
     gene.inID = 0;
     gene.outID = 2;
-    gene.weight = 0.5;
+    gene.weight = 1;
     gene.enabled = true;
     code.addGene(gene);
     //-----2-----
     gene.inID = 1;
     gene.outID = 3;
-    gene.weight = 0.5;
+    gene.weight = 1;
     gene.enabled = true;
     code.addGene(gene);
     //-----3-----
     gene.inID = 1;
     gene.outID = 4;
-    gene.weight = 0.5;
+    gene.weight = 1;
     gene.enabled = true;
     code.addGene(gene);
     //-----4-----
     gene.inID = 2;
     gene.outID = 5;
-    gene.weight = 0.5;
+    gene.weight = 1;
     gene.enabled = true;
     code.addGene(gene);
     //-----5-----
     gene.inID = 3;
     gene.outID = 5;
-    gene.weight = 0.5;
+    gene.weight = 1;
     gene.enabled = true;
     code.addGene(gene);
     //-----6-----
     gene.inID = 4;
     gene.outID = 6;
-    gene.weight = 0.5;
+    gene.weight = 1;
     gene.enabled = true;
     code.addGene(gene);
     //-----7-----
     gene.inID = 5;
     gene.outID = 7;
-    gene.weight = 0.5;
+    gene.weight = 1;
     gene.enabled = true;
     code.addGene(gene);
     //-----8-----
     gene.inID = 5;
     gene.outID = 8;
-    gene.weight = 0.5;
+    gene.weight = 1;
     gene.enabled = true;
     code.addGene(gene);
     //-----9-----
     gene.inID = 6;
     gene.outID = 8;
-    gene.weight = 0.5;
+    gene.weight = 1;
     gene.enabled = true;
     code.addGene(gene);
 
@@ -86,6 +86,16 @@ int main( int argc, char * argv[])
 
     NeuralNetwork testNetwork;
     testNetwork.loadFromFile("../TestGenome.charzar");
+
+    std::vector<double> val {1,1};
+    testNetwork.setInputs(val);
     testNetwork.runForward(2);
+
+    val = testNetwork.getNetworkOutput();
+
+    for(auto value : val)
+        std::cout << "value " << value << std::endl;
+
+
     return 0;
 }
