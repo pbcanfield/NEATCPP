@@ -148,55 +148,42 @@ void NeuralNetwork::setInputs(std::vector<double> input)
  */
 void NeuralNetwork::runForward(unsigned int numThreads)
 {
-    layerProcessed = 1; //start at the first hidden layer.
+    ++numThreads;
+    //Initialize completed to numThreads for first iteration.
+    completed = 0;
+    unsigned int totalLayers = hiddenLayer.size() + 2;
 
-    //Initialize the completed vector to false;
-    for(unsigned int i = 0 ; i < numThreads; ++i)
-        completed.push_back(false);
 
     //This is where the multithreading starts.
-    for(unsigned int i = 0; i < numThreads; ++i)
+    for(unsigned int i = 0; i < numThreads - 1; ++i)
         threads.push_back(new std::thread(&NeuralNetwork::processForward,this,i,numThreads));
 
-
-    // It should be +2 but im saving a computation because
-    // 1 will be subtracted later.
-    unsigned int totalLayers = hiddenLayer.size() + 2;
-    unsigned int checkNum = 0;
-    bool mainComplete = false;
-
+    unsigned int thisLayer = 1;
     unsigned int rem;
-    while(layerProcessed != totalLayers)
+
+    while(thisLayer != totalLayers)
     {
-        if(!mainComplete)
+        ++completed;
+
+        lockFunc(completed,numThreads);
+
+        completed = 0;
+        mLock.lock();
+        unsigned int nLayer = findNumInLayer(thisLayer);
+        mLock.unlock();
+
+        rem = nLayer % numThreads;
+        if(rem != 0)
         {
-            unsigned int nLayer = findNumInLayer(layerProcessed);
-            rem = nLayer % numThreads;
-            if(rem != 0)
-            {
-                std::vector<Node*> & currentLayer = getLayer(layerProcessed);
-                for(unsigned int i = nLayer - rem; i < nLayer; ++i)
-                    currentLayer[i] -> calculate();
-            }
-            mainComplete = true;
+            mLock.lock();
+            std::vector<Node*> & currentLayer = getLayer(thisLayer);
+            mLock.unlock();
+
+            for(unsigned int i = nLayer - rem; i < nLayer; ++i)
+                currentLayer[i] -> calculate();
         }
 
-        //check if every thread has completed;
-        checkNum = 0;
-        for(auto status : completed)
-            if(status)
-                ++checkNum;
-
-        if(checkNum == numThreads)
-        {
-
-            for(unsigned int i = 0; i < completed.size(); ++i)
-                completed[i] = false;
-            mainComplete = false;
-            ++layerProcessed;
-        }
-
-
+        ++thisLayer;
     }
 
 
@@ -293,26 +280,33 @@ Node * NeuralNetwork::findNodeWithID(unsigned int ID)
 void NeuralNetwork::processForward(unsigned int ID, unsigned int numThreads)
 {
     unsigned int workload, numInLayer;
-    unsigned int totalLayers = hiddenLayer.size() + 2;
+    unsigned int thisLayer = 1;
+
     std::vector<Node*> layer;
-    bool complete;
 
+    mLock.lock();
+    unsigned int totalLayers = hiddenLayer.size() + 2;
+    mLock.unlock();
 
-    while(layerProcessed != totalLayers)
+    while(thisLayer != totalLayers)
     {
-        layer = getLayer(layerProcessed);
-        numInLayer = findNumInLayer(layerProcessed);
+        ++completed;
+
+
+        lockFunc(completed,numThreads);
+        lockFunc(completed,0);
+
+        mLock.lock();
+        layer = getLayer(thisLayer);
+        numInLayer = findNumInLayer(thisLayer);
+        mLock.unlock();
+
         workload = ((numInLayer - ( numInLayer % numThreads)) / numThreads) + ID;
         for(unsigned int i = ID; i < workload; ++i)
             layer[i] -> calculate();
 
-        completed[ID] = true;
-        complete = false;
-        while(!complete && layerProcessed != totalLayers)
-        {
-            if(!completed[ID])
-                complete = true;
-        }
+        ++thisLayer;
+
     }
 }
 
@@ -343,4 +337,16 @@ std::vector<Node*> & NeuralNetwork::getLayer(unsigned int pos)
         return hiddenLayer[pos - 1];
 
     return outputs;
+}
+
+void NeuralNetwork::lockFunc(std::atomic<unsigned int> & current, unsigned int target)
+{
+    bool go = false;
+    while (!go)
+    {
+        if(current == target)
+            go = true;
+        else
+            std::this_thread::yield();
+    }
 }

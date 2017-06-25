@@ -17,7 +17,7 @@ int main( int argc, char * argv[])
     code.setHidden(topo);
     code.setOutput(2);
 
-    b = 1;
+    b = 0;
     code.addBias(b);
     code.addBias(b);
     code.addBias(b);

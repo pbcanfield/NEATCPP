@@ -6,7 +6,9 @@
 #include <vector>
 #include <string>
 #include <thread>
+#include <mutex>
 #include <atomic>
+
 
 class NeuralNetwork
 {
@@ -31,6 +33,7 @@ private:
     void processForward(unsigned int,unsigned int);
     unsigned int findNumInLayer(unsigned int);
     std::vector<Node*> & getLayer(unsigned int);
+    void lockFunc(std::atomic<unsigned int> &, unsigned int);
 
     std::vector<Node*> inputs;
     std::vector<std::vector<Node*>> hiddenLayer;
@@ -41,8 +44,8 @@ private:
 
     //multithreading
     std::vector<std::thread*> threads;
-    std::vector<bool> completed;
-    std::atomic<unsigned int> layerProcessed;
+    std::mutex mLock;
+    std::atomic<unsigned int> completed;
 };
 
 #endif
