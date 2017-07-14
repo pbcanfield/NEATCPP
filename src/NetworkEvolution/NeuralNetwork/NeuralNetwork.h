@@ -22,7 +22,8 @@ public:
     void mutate();
 
     void setInputs(std::vector<double>);
-    void runForward(unsigned int=0);
+    void runForward();
+    void runForward(unsigned int);
 
     void saveNetwork(std::string);
     void loadFromFile(std::string);

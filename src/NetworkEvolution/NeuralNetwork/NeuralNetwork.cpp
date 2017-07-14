@@ -140,6 +140,27 @@ void NeuralNetwork::setInputs(std::vector<double> input)
 
     }
 }
+/**
+ This is the member function that is responisble for running
+ the single threaded forward propogation for the
+ neural network.
+ */
+
+void NeuralNetwork::runForward()
+{
+    //THANKS KRITIKA
+    for (auto & node : hiddenLayer[0])
+        node -> calculate();
+
+    unsigned int size = hiddenLayer.size();
+
+    for(unsigned int i = 1; i < size; ++i)
+        for(unsigned int j = 0; j < hiddenLayer[i].size(); ++j)
+            hiddenLayer[i][j] -> calculate();
+
+    for (auto & node: outputs)
+        node -> calculate();
+}
 
 /**
  * This is the function that is responisble for handling

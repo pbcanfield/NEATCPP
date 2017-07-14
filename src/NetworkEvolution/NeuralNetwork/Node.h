@@ -8,6 +8,7 @@
 
 #include <vector>
 #include <iostream>
+#include <math.h>
 #include "Weight.h"
 
 class Node
@@ -26,24 +27,27 @@ public:
     void removeBConnections();
     void addForward(Node *, Node *, double=0);
     void addBackwards(Weight *);
-    void setBias(double);
 
     // Getter
     Weight * getLastForward();
     Weight * getLastBackwards();
-    double & value() { return val; };
+    double & value() { return val; }
+    double getSum() { return sum; }
 
 
 private:
+
+    double sigmoidDerivative(double);
+    double sigmoidActivation(double);
 
     // These are all the connections of the nodes, the weights will act as a middleman
     // for the node, since
     std::vector<Weight*> fConnections;
     std::vector<Weight*> bConnections;
 
-    // The value and the bias
+    // The value
     double val = 0;
-    double bias = 0;
+    double sum;
 
 };
 

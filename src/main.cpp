@@ -89,7 +89,7 @@ int main( int argc, char * argv[])
 
     std::vector<double> val {1,1};
     testNetwork.setInputs(val);
-    testNetwork.runForward(2);
+    testNetwork.runForward();
 
     val = testNetwork.getNetworkOutput();
 

@@ -16,7 +16,7 @@ Node::Node()
  * otherwise, both values will be 0 */
 Node::Node(double b)
 {
-    bias = b;
+    //bias = b;
 }
 
 /* Destroys every connection after */
@@ -67,15 +67,22 @@ Weight * Node::getLastBackwards()
  */
 void Node::calculate()
 {
-    double sum;
+    double sum = 0;
     for(auto weight : bConnections) {
         sum += weight->value() * weight->bNode()->value();
     }
-    val = sum + bias;
+    this -> sum = sum;
+    val = sigmoidActivation(sum);
+
 }
 
-/* This function changes the bias. */
-void Node::setBias(double b)
+double Node::sigmoidDerivative(double x)
 {
-    bias = b;
+    double sigmoid = sigmoidActivation(x);
+    return sigmoid * (1 - sigmoid);
+}
+
+double Node::sigmoidActivation(double x)
+{
+    return 1.0 / (1 + pow(M_E,x * -1));
 }
