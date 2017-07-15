@@ -8,25 +8,19 @@ int main( int argc, char * argv[])
 {
 
     //This is a test genome that I have wrote to a file for testing.
-
     Gene gene;
-    double b;
+    Bias bias;
     Genome code;
     std::vector<unsigned int> topo {3,2};
     code.setInput(2);
     code.setHidden(topo);
     code.setOutput(2);
 
-    b = 0;
-    code.addBias(b);
-    code.addBias(b);
-    code.addBias(b);
-    code.addBias(b);
-    code.addBias(b);
-    code.addBias(b);
-    code.addBias(b);
-    code.addBias(b);
-    code.addBias(b);
+    bias.b = 0.5;
+    bias.layer = 1;
+    code.addBias(bias);
+    bias.layer = 3;
+    code.addBias(bias);
     //-----1-----
     gene.inID = 0;
     gene.outID = 2;

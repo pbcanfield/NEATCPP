@@ -44,8 +44,23 @@ NeuralNetwork::NeuralNetwork(Genome code)
  */
 NeuralNetwork::~NeuralNetwork()
 {
+    //Delete the genome.
     delete dna;
 
+    //Remove the bias "nodes" from the network.
+    unsigned int totalSize = hiddenLayer.size() + 2;
+
+
+    double * testing;
+    for(unsigned int i = 0; i < totalSize; ++i)
+    {
+        testing = getLayer(i)[0] -> getBiasPtr();
+        if(testing != NULL)
+            delete testing;
+    }
+    
+
+    //Delete the nodes of the network.
     for(auto & node : inputs)
         delete node;
 
@@ -55,6 +70,8 @@ NeuralNetwork::~NeuralNetwork()
 
     for(auto & node : outputs)
         delete node;
+
+
 }
 
 /**
@@ -76,35 +93,27 @@ void NeuralNetwork::updateStructure()
     outputs.clear();
     //Create the nodes in the network.
     //Create the input layer.
-    double currentNode;
-    unsigned int alreadyProcessed = dna -> getInput();
-    for(unsigned int i = 0; i < alreadyProcessed; ++i)
-    {
-        currentNode = dna -> getBias(i);
-        inputs.push_back(new Node(currentNode));
-    }
+    unsigned int size = dna -> getInput();
+    for(unsigned int i = 0; i < size; ++i)
+        inputs.push_back(new Node());
+
     //Create the hidden layer.
     std::vector<unsigned int> topo = dna -> getHidden();
-    unsigned int size = topo.size();
+    size = topo.size();
 
     hiddenLayer.resize(size);
 
     for(unsigned int i = 0; i < size; ++i)
-    {
         for(unsigned int j = 0; j < topo[i]; ++j)
-        {
-            currentNode = dna -> getBias(alreadyProcessed);
-            hiddenLayer[i].push_back(new Node(currentNode));
-            ++alreadyProcessed;
-        }
-    }
+            hiddenLayer[i].push_back(new Node());
+
+
     //Create the output layer.
-    for(unsigned int i = 0; i < dna -> getOutput(); ++i)
-    {
-        currentNode = dna -> getBias(alreadyProcessed);
-        outputs.push_back(new Node(currentNode));
-        ++alreadyProcessed;
-    }
+    size = dna -> getOutput();
+    for(unsigned int i = 0; i < size; ++i)
+        outputs.push_back(new Node());
+
+
     //Connect structure based on the genes in the genome and add the correct weights.
     unsigned int numConnections = dna -> getGenes().size();
     Gene currentGene;
@@ -117,6 +126,24 @@ void NeuralNetwork::updateStructure()
         last = findNodeWithID(currentGene.outID);
         first -> addForward(last,first,currentGene.weight);
         last -> addBackwards(first -> getLastForward());
+    }
+
+    std::vector<Node*> tempLayer;
+    Bias tempBias;
+    double * biasPtr;
+
+    size = dna -> getBiasSize();
+    for(unsigned int i = 0; i < size; ++i)
+    {
+        tempBias = dna -> getBias(i);
+        tempLayer = getLayer(tempBias.layer);
+
+        biasPtr = new double;
+        *biasPtr = tempBias.b;
+
+        for(auto & node : tempLayer)
+            node -> setBiasPtr(biasPtr);
+
     }
 }
 
@@ -164,7 +191,7 @@ void NeuralNetwork::runForward()
 
 /**
  * This is the function that is responisble for handling
- * the multithreading that runs the forward propgation
+ * the multithreading that runs the forward propogtion
  * for the neural network.
  */
 void NeuralNetwork::runForward(unsigned int numThreads)
@@ -203,7 +230,6 @@ void NeuralNetwork::runForward(unsigned int numThreads)
             for(unsigned int i = nLayer - rem; i < nLayer; ++i)
                 currentLayer[i] -> calculate();
         }
-
         ++thisLayer;
     }
 
@@ -286,8 +312,6 @@ Node * NeuralNetwork::findNodeWithID(unsigned int ID)
 
     ID -= inputs.size() + hiddenLayerSize;
     return outputs[ID];
-
-
 }
 
 

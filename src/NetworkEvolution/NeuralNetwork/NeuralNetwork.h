@@ -36,9 +36,11 @@ private:
     std::vector<Node*> & getLayer(unsigned int);
     void lockFunc(std::atomic<unsigned int> &, unsigned int);
 
+
     std::vector<Node*> inputs;
     std::vector<std::vector<Node*>> hiddenLayer;
     std::vector<Node*> outputs;
+    
     Genome * dna;
 
     unsigned int generation;

@@ -8,4 +8,10 @@ struct Gene
 	bool enabled;
 	int generation;
 };
+
+struct Bias
+{
+	double b;
+	unsigned int layer;
+};
 #endif

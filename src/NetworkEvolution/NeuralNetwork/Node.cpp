@@ -13,10 +13,12 @@ Node::Node()
 }
 
 /* Constructs a node that pre-sets the value and the bias,
- * otherwise, both values will be 0 */
+ * otherwise, the bias will be a NULL ptr and the value will be 0
+ */
 Node::Node(double b)
 {
-    //bias = b;
+    *bias = b;
+    val = 0;
 }
 
 /* Destroys every connection after */
@@ -24,6 +26,7 @@ Node::~Node()
 {
     for(auto & weight : fConnections)
         delete weight;
+
 }
 
 /* This function takes in a forward node, backward node, and a weight to
@@ -43,6 +46,16 @@ void Node::addBackwards(Weight * weight)
 {
     bConnections.push_back(weight);
 }
+
+/* This is the setter for the bias pointer.
+ * A bias may or may not exist and therfor it is Initialized to NULL
+ */
+
+void Node::setBiasPtr(double * b)
+{
+    bias = b;
+}
+
 
 
 /* This function is used to connect up the network.
@@ -71,10 +84,14 @@ void Node::calculate()
     for(auto weight : bConnections) {
         sum += weight->value() * weight->bNode()->value();
     }
+    if(bias != NULL)
+        sum += *bias;
+
     this -> sum = sum;
     val = sigmoidActivation(sum);
 
 }
+
 
 double Node::sigmoidDerivative(double x)
 {
