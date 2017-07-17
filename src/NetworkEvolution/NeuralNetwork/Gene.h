@@ -9,10 +9,9 @@ struct Gene
 	int generation;
 };
 
-struct NodeInfo
+struct Bias
 {
-    double value;
-    double bias;
+	double b;
+	unsigned int layer;
 };
-
 #endif

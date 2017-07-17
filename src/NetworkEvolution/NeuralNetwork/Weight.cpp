@@ -18,3 +18,16 @@ Weight::~Weight()
     //delete fconnection;
     //delete bconnection;
 }
+
+void Weight::calculateGradient(double eTotal, double outDer, double learningRate)
+{
+    updatedWeight = weight - learningRate *
+                             bConnection -> value() *
+                             eTotal *
+                             outDer;
+}
+
+void Weight::update()
+{
+    weight = updatedWeight;
+}

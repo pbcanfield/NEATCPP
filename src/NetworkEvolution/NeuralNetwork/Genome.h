@@ -13,7 +13,7 @@ public:
 	Genome();
 	Genome(std::string);
 	void addGene(Gene);
-    void addNode(NodeInfo);
+    void addBias(Bias);
 	void setInput(unsigned int);
 	void setHidden(std::vector<unsigned int>);
 	void setOutput(unsigned int);
@@ -27,10 +27,11 @@ public:
     void copyIntoGenome(Genome &);
 
     std::vector<Gene> getGenes();
+    std::vector<Bias> getBiasVector();
 	Gene getGene(unsigned int);
-    NodeInfo getNode(unsigned int);
+    Bias getBias(unsigned int);
 	unsigned int getGenomeSize();
-    unsigned int getNodeInfoSize();
+    unsigned int getBiasSize();
 
 	unsigned int getInput();
 	std::vector<unsigned int> getHidden();
@@ -39,10 +40,14 @@ public:
 private:
 
 	std::vector<Gene> geneticCode;
-    std::vector<NodeInfo> nodeCode;
+    std::vector<Bias> biasInfo;
 	unsigned int input;
 	std::vector<unsigned int> hiddenLayer;
 	unsigned int output;
+
+	const unsigned int INT = sizeof(int);
+	const unsigned int DOUBLE = sizeof(double);
+	const unsigned int BOOL = sizeof(bool);
 };
 
 #endif

@@ -1,6 +1,9 @@
 #include "Genome.h"
 #include <iostream>
-
+/**
+ * Author: Pete Canfield & Daiwei Chen
+ * Date: 2017-6-15
+ */
 
 Genome::Genome()
 {
@@ -51,30 +54,35 @@ void Genome::saveGenome(std::string dir)
 {
      std::ofstream charizard(dir, std::ios::binary);
 
+
      //writes the metadata to the file
-     //the first int that is written is the size of the metadata
+     //the first int that is written is the size of the hidden layer
+     //the second int that is writtien is the number of biases
      //then the input, the hiddenLayer, and the outputlayer is written
 
-     unsigned int layerSize = hiddenLayer.size();
-     charizard.write((char*)&layerSize, sizeof(int));
-     charizard.write((char*)&input,sizeof(int));
-     for(auto & layer: hiddenLayer)
-          charizard.write((char*)&layer,sizeof(int));
-     charizard.write((char*)&output,sizeof(int));
+     unsigned int castingVar = hiddenLayer.size();
+     charizard.write((char*)&castingVar,INT);
+     castingVar = biasInfo.size();
+     charizard.write((char*)&castingVar,INT);
 
-     for(auto & node : nodeCode)
+     charizard.write((char*)&input,INT);
+     for(auto & layer: hiddenLayer)
+          charizard.write((char*)&layer,INT);
+     charizard.write((char*)&output,INT);
+
+     for(auto & bias : biasInfo)
      {
-         charizard.write((char*)&node.value,sizeof(double));
-         charizard.write((char*)&node.bias,sizeof(double));
+         charizard.write((char*)&bias.b,DOUBLE);
+         charizard.write((char*)&bias.layer,INT);
      }
 
      for(auto & gene: geneticCode)
      {
-          charizard.write((char*)&gene.inID,sizeof(int));
-          charizard.write((char*)&gene.outID,sizeof(int));
-          charizard.write((char*)&gene.weight,sizeof(double));
-          charizard.write((char*)&gene.enabled,sizeof(bool));
-          charizard.write((char*)&gene.generation,sizeof(int));
+          charizard.write((char*)&gene.inID,INT);
+          charizard.write((char*)&gene.outID,INT);
+          charizard.write((char*)&gene.weight,DOUBLE);
+          charizard.write((char*)&gene.enabled,BOOL);
+          charizard.write((char*)&gene.generation,INT);
      }
 
      charizard.close();
@@ -84,43 +92,44 @@ void Genome::loadFromFile(std::string dir)
 {
      hiddenLayer.clear();
      geneticCode.clear();
+     biasInfo.clear();
      std::ifstream cry(dir, std::ios::binary);
 
      if(cry.is_open())
      {
           unsigned int networkSize = 0;
-          unsigned int totalSize;
-          cry.read((char*)&totalSize,sizeof(int));
-          cry.read((char*)&input,sizeof(int));
+          unsigned int totalSize,biasSize;
+          cry.read((char*)&totalSize,INT);
+          cry.read((char*)&biasSize,INT);
+          cry.read((char*)&input,INT);
           networkSize += input;
 
           unsigned int layer;
           for(unsigned int i = 0; i < totalSize; ++i)
           {
-               cry.read((char*)&layer,sizeof(int));
+               cry.read((char*)&layer,INT);
                hiddenLayer.push_back(layer);
                networkSize += layer;
           }
 
-          cry.read((char*)&output,sizeof(int));
+          cry.read((char*)&output,INT);
           networkSize += output;
 
-          NodeInfo nTemp;
-          for(unsigned int i = 0 ; i < networkSize; ++i)
+          Bias bTemp;
+          for(unsigned int i = 0 ; i < biasSize; ++i)
           {
-              cry.read((char*)&nTemp.value,sizeof(double));
-              cry.read((char*)&nTemp.bias,sizeof(double));
-              nodeCode.push_back(nTemp);
+              cry.read((char*)&bTemp.b,DOUBLE);
+              cry.read((char*)&bTemp.layer,INT);
+              biasInfo.push_back(bTemp);
           }
-
           Gene gTemp;
           while(!cry.eof())
           {
-               cry.read((char*)&gTemp.inID,sizeof(int));
-               cry.read((char*)&gTemp.outID,sizeof(int));
-               cry.read((char*)&gTemp.weight,sizeof(double));
-               cry.read((char*)&gTemp.enabled,sizeof(bool));
-               cry.read((char*)&gTemp.generation,sizeof(int));
+               cry.read((char*)&gTemp.inID,INT);
+               cry.read((char*)&gTemp.outID,INT);
+               cry.read((char*)&gTemp.weight,DOUBLE);
+               cry.read((char*)&gTemp.enabled,BOOL);
+               cry.read((char*)&gTemp.generation,INT);
                geneticCode.push_back(gTemp);
           }
           geneticCode.pop_back(); // this is a work around and needs to be fixed
@@ -132,32 +141,39 @@ void Genome::loadFromFile(std::string dir)
      }
 }
 
-void Genome::addNode(NodeInfo info)
+void Genome::addBias(Bias info)
 {
-    nodeCode.push_back(info);
+    biasInfo.push_back(info);
 }
 
-NodeInfo Genome::getNode(unsigned int pos)
+Bias Genome::getBias(unsigned int pos)
 {
-    return nodeCode[pos];
+    return biasInfo[pos];
 }
 
-unsigned int Genome::getNodeInfoSize()
+unsigned int Genome::getBiasSize()
 {
-    return nodeCode.size();
+    return biasInfo.size();
 }
 
 void Genome::copyIntoGenome(Genome & code)
 {
     geneticCode = code.getGenes();
+    biasInfo = code.getBiasVector();
     input = code.getInput();
     hiddenLayer = code.getHidden();
     output = code.getOutput();
+
 }
 
 std::vector<Gene> Genome::getGenes()
 {
     return geneticCode;
+}
+
+std::vector<Bias> Genome::getBiasVector()
+{
+    return biasInfo;
 }
 
 Gene Genome::getGene(unsigned int pos)
