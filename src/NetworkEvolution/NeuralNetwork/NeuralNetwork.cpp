@@ -58,7 +58,6 @@ NeuralNetwork::~NeuralNetwork()
         if(testing != NULL)
             delete testing;
     }
-    
 
     //Delete the nodes of the network.
     for(auto & node : inputs)
@@ -143,7 +142,6 @@ void NeuralNetwork::updateStructure()
 
         for(auto & node : tempLayer)
             node -> setBiasPtr(biasPtr);
-
     }
 }
 
@@ -167,6 +165,16 @@ void NeuralNetwork::setInputs(std::vector<double> input)
 
     }
 }
+
+void NeuralNetwork::setTraining(std::vector<double> traingingVector)
+{
+    if(traingingVector.size() == outputs.size())
+        training = traingingVector;
+    else
+        std::cout << "Could not set the training examples because the training set is not the correct length"
+            << std::endl;
+}
+
 /**
  This is the member function that is responisble for running
  the single threaded forward propogation for the
@@ -240,6 +248,35 @@ void NeuralNetwork::runForward(unsigned int numThreads)
         delete thread;
     }
 
+}
+
+double NeuralNetwork::getLMSError()
+{
+    unsigned int size = outputs.size();
+    double sum = 0;
+
+    for (unsigned int i = 0; i < size; ++i)
+        sum += 0.5 * pow(training[i] - outputs[i] -> value(),2);
+
+    return sum;
+}
+
+void NeuralNetwork::gradientDecent(double learningRate)
+{
+    unsigned int size = outputs.size();
+    for(unsigned int i = 0; i < size; ++i)
+        outputs[i] -> backPropogation(training[i],learningRate);
+
+    for(int i = hiddenLayer.size() - 1; i >= 0; --i)
+        for(unsigned int j = 0; j < hiddenLayer[i].size(); ++j)
+            hiddenLayer[i][j] -> backPropogation(learningRate);
+
+    for(auto & vec : hiddenLayer)
+        for(auto & node : vec)
+            node -> updateWeights();
+
+    for(auto & node : outputs)
+        node -> updateWeights();
 }
 
 /**

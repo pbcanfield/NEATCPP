@@ -22,7 +22,11 @@ public:
 
     // Calculating and Learning
     void calculate();
-    void calculate(double);
+    void backPropogation(double);
+    void backPropogation(double,double);
+    void updateWeights();
+
+
     // Modifying the network
     void removeFConnections();
     void removeBConnections();
@@ -34,10 +38,9 @@ public:
     Weight * getLastForward();
     Weight * getLastBackwards();
     double & value() { return val; }
-    double getSum() { return sum; }
     double * getBiasPtr() { return bias; }
-
-
+    double getOutDerivative() { return outDer; }
+    double getETotal() { return eTotal; }
 private:
 
     double sigmoidDerivative(double);
@@ -49,7 +52,7 @@ private:
     std::vector<Weight*> bConnections;
 
     // The value and sum
-    double val,sum;
+    double val,eTotal,outDer;
 
 
     //This is the bias value for the network.

@@ -8,6 +8,7 @@ int main( int argc, char * argv[])
 {
 
     //This is a test genome that I have wrote to a file for testing.
+    /*
     Gene gene;
     Bias bias;
     Genome code;
@@ -77,19 +78,26 @@ int main( int argc, char * argv[])
     code.addGene(gene);
 
     code.saveGenome("../TestGenome.charzar");
+    */
 
     NeuralNetwork testNetwork;
     testNetwork.loadFromFile("../TestGenome.charzar");
 
-    std::vector<double> val {1,1};
+    std::vector<double> val {0.5,0.25};
     testNetwork.setInputs(val);
+    val[0] = 0.33;
+    val[1] = 0.42;
+
+    testNetwork.setTraining(val);
     testNetwork.runForward();
 
-    val = testNetwork.getNetworkOutput();
-
-    for(auto value : val)
-        std::cout << "value " << value << std::endl;
-
+    std::cout << "Total Error: " << testNetwork.getLMSError() << std::endl;
+    for(unsigned int i = 0; i < 1000; ++i)
+    {
+        testNetwork.gradientDecent(0.5);
+        testNetwork.runForward();
+    }
+    std::cout << "Total Error: " << testNetwork.getLMSError() << std::endl;
 
     return 0;
 }

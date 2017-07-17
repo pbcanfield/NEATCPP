@@ -26,7 +26,6 @@ Node::~Node()
 {
     for(auto & weight : fConnections)
         delete weight;
-
 }
 
 /* This function takes in a forward node, backward node, and a weight to
@@ -87,17 +86,39 @@ void Node::calculate()
     if(bias != NULL)
         sum += *bias;
 
-    this -> sum = sum;
     val = sigmoidActivation(sum);
-
 }
 
-
-double Node::sigmoidDerivative(double x)
+void Node::backPropogation(double learningRate)
 {
-    double sigmoid = sigmoidActivation(x);
-    return sigmoid * (1 - sigmoid);
+    outDer = val * (1.0 - val);
+    Node * currentNode;
+    eTotal = 0;
+    for(auto & weight : fConnections)
+    {
+        currentNode = weight -> fNode();
+        eTotal += currentNode -> getETotal() *
+                  currentNode -> getOutDerivative() *
+                  weight -> value();
+    }
+    for(auto weight : bConnections)
+        weight -> calculateGradient(eTotal,outDer,learningRate);
 }
+
+void Node::backPropogation(double learningRate, double target)
+{
+    eTotal = val - target;
+    outDer = val * (1.0 - val);
+    for(auto weight : bConnections)
+        weight -> calculateGradient(eTotal,outDer,learningRate);
+}
+
+void Node::updateWeights()
+{
+    for(auto & weight : fConnections)
+        weight -> update();
+}
+
 
 double Node::sigmoidActivation(double x)
 {

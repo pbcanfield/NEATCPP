@@ -4,6 +4,7 @@
 #include "Genome.h"
 #include "Node.h"
 #include <vector>
+#include <math.h>
 #include <string>
 #include <thread>
 #include <mutex>
@@ -22,8 +23,13 @@ public:
     void mutate();
 
     void setInputs(std::vector<double>);
+    void setTraining(std::vector<double>);
     void runForward();
     void runForward(unsigned int);
+    void gradientDecent(double);
+
+
+    double getLMSError();
 
     void saveNetwork(std::string);
     void loadFromFile(std::string);
@@ -40,7 +46,8 @@ private:
     std::vector<Node*> inputs;
     std::vector<std::vector<Node*>> hiddenLayer;
     std::vector<Node*> outputs;
-    
+    std::vector<double> training;
+
     Genome * dna;
 
     unsigned int generation;
