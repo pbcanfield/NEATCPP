@@ -8,7 +8,7 @@ int main( int argc, char * argv[])
 {
 
     //This is a test genome that I have wrote to a file for testing.
-    /*
+
     Gene gene;
     Bias bias;
     Genome code;
@@ -17,10 +17,10 @@ int main( int argc, char * argv[])
     code.setHidden(topo);
     code.setOutput(2);
 
-    bias.b = 0.5;
-    bias.layer = 1;
+    bias.bias = 0.5;
+    bias.node = 1;
     code.addBias(bias);
-    bias.layer = 3;
+    bias.node = 3;
     code.addBias(bias);
     //-----1-----
     gene.inID = 0;
@@ -78,7 +78,7 @@ int main( int argc, char * argv[])
     code.addGene(gene);
 
     code.saveGenome("../TestGenome.charzar");
-    */
+
 
     NeuralNetwork testNetwork;
     testNetwork.loadFromFile("../TestGenome.charzar");

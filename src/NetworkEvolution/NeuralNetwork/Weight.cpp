@@ -19,12 +19,11 @@ Weight::~Weight()
     //delete bconnection;
 }
 
-void Weight::calculateGradient(double eTotal, double outDer, double learningRate)
+void Weight::calculateGradient(double delta, double learningRate)
 {
     updatedWeight = weight - (learningRate *
                              bConnection -> value() *
-                             eTotal *
-                             outDer);
+                             delta);
 }
 
 void Weight::update()

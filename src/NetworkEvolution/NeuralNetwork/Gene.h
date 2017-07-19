@@ -11,7 +11,7 @@ struct Gene
 
 struct Bias
 {
-	double b;
-	unsigned int layer;
+	double bias;
+	unsigned int node;
 };
 #endif

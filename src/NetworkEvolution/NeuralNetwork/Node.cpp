@@ -15,10 +15,9 @@ Node::Node()
 /* Constructs a node that pre-sets the value and the bias,
  * otherwise, the bias will be a NULL ptr and the value will be 0
  */
-Node::Node(double b)
+Node::Node(double bias)
 {
-    *bias = b;
-    val = 0;
+     b = bias;
 }
 
 /* Destroys every connection after */
@@ -45,16 +44,6 @@ void Node::addBackwards(Weight * weight)
 {
     bConnections.push_back(weight);
 }
-
-/* This is the setter for the bias pointer.
- * A bias may or may not exist and therfor it is Initialized to NULL
- */
-
-void Node::setBiasPtr(double * b)
-{
-    bias = b;
-}
-
 
 
 /* This function is used to connect up the network.
@@ -83,34 +72,35 @@ void Node::calculate()
     for(auto weight : bConnections) {
         sum += weight->value() * weight->bNode()->value();
     }
-    if(bias != NULL)
-        sum += *bias;
+    sum += b;
 
     val = sigmoidActivation(sum);
 }
 
 void Node::backPropogation(double learningRate)
 {
-    outDer = val * (1.0 - val);
-    Node * currentNode;
-    eTotal = 0;
+
+    double sum = 0;
     for(auto & weight : fConnections)
-    {
-        currentNode = weight -> fNode();
-        eTotal += currentNode -> getETotal() *
-                  currentNode -> getOutDerivative() *
-                  weight -> value();
-    }
+        sum += weight -> fNode() -> getDelta() * weight -> value();
+
+    delta = sum * val * (1.0 - val);
+
     for(auto weight : bConnections)
-        weight -> calculateGradient(eTotal,outDer,learningRate);
+        weight -> calculateGradient(delta,learningRate);
+
+    if(b != 0)
+        b -= learningRate * delta;
 }
 
 void Node::backPropogation(double learningRate, double target)
 {
-    eTotal = val - target;
-    outDer = val * (1.0 - val);
+    delta = (val - target) * (val * (1.0 - val));
     for(auto weight : bConnections)
-        weight -> calculateGradient(eTotal,outDer,learningRate);
+        weight -> calculateGradient(delta,learningRate);
+
+    if(b != 0)
+        b -= learningRate * delta;
 }
 
 void Node::updateWeights()

@@ -32,15 +32,12 @@ public:
     void removeBConnections();
     void addForward(Node *, Node *, double=0);
     void addBackwards(Weight *);
-    void setBiasPtr(double *);
-
     // Getter
     Weight * getLastForward();
     Weight * getLastBackwards();
     double & value() { return val; }
-    double * getBiasPtr() { return bias; }
-    double getOutDerivative() { return outDer; }
-    double getETotal() { return eTotal; }
+    double & bias() { return b; }
+    double getDelta() { return delta; }
 private:
 
     double sigmoidDerivative(double);
@@ -51,12 +48,11 @@ private:
     std::vector<Weight*> fConnections;
     std::vector<Weight*> bConnections;
 
-    // The value and sum
-    double val,eTotal,outDer;
+    // The value,bias and sum
+    double val,delta;
+    double b = 0;
 
 
-    //This is the bias value for the network.
-    double * bias = NULL;
 
 };
 

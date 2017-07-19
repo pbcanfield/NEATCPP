@@ -72,8 +72,8 @@ void Genome::saveGenome(std::string dir)
 
      for(auto & bias : biasInfo)
      {
-         charizard.write((char*)&bias.b,DOUBLE);
-         charizard.write((char*)&bias.layer,INT);
+         charizard.write((char*)&bias.bias,DOUBLE);
+         charizard.write((char*)&bias.node,INT);
      }
 
      for(auto & gene: geneticCode)
@@ -118,8 +118,8 @@ void Genome::loadFromFile(std::string dir)
           Bias bTemp;
           for(unsigned int i = 0 ; i < biasSize; ++i)
           {
-              cry.read((char*)&bTemp.b,DOUBLE);
-              cry.read((char*)&bTemp.layer,INT);
+              cry.read((char*)&bTemp.bias,DOUBLE);
+              cry.read((char*)&bTemp.node,INT);
               biasInfo.push_back(bTemp);
           }
           Gene gTemp;

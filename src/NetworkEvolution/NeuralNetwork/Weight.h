@@ -11,7 +11,7 @@ public:
     Weight(Node *, Node *, double = 0);
     ~Weight();
 
-    void calculateGradient(double,double,double);
+    void calculateGradient(double,double);
     void update();
 
     Node *& fNode() {return fConnection;}

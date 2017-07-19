@@ -47,18 +47,6 @@ NeuralNetwork::~NeuralNetwork()
     //Delete the genome.
     delete dna;
 
-    //Remove the bias "nodes" from the network.
-    unsigned int totalSize = hiddenLayer.size() + 2;
-
-
-    double * testing;
-    for(unsigned int i = 0; i < totalSize; ++i)
-    {
-        testing = getLayer(i)[0] -> getBiasPtr();
-        if(testing != NULL)
-            delete testing;
-    }
-
     //Delete the nodes of the network.
     for(auto & node : inputs)
         delete node;
@@ -127,22 +115,12 @@ void NeuralNetwork::updateStructure()
         last -> addBackwards(first -> getLastForward());
     }
 
-    std::vector<Node*> tempLayer;
-    Bias tempBias;
-    double * biasPtr;
+    //Could optimize this bit but I dont know if its worth the memory overhead
+    //to copy into a seperate vector.
+    //sets the biases.
+    for(auto & bias : dna -> getBiasVector())
+        findNodeWithID(bias.node) -> bias() = bias.bias;
 
-    size = dna -> getBiasSize();
-    for(unsigned int i = 0; i < size; ++i)
-    {
-        tempBias = dna -> getBias(i);
-        tempLayer = getLayer(tempBias.layer);
-
-        biasPtr = new double;
-        *biasPtr = tempBias.b;
-
-        for(auto & node : tempLayer)
-            node -> setBiasPtr(biasPtr);
-    }
 }
 
 
