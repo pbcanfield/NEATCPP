@@ -265,7 +265,7 @@ void NeuralNetwork::gradientDecent(double learningRate)
 {
     unsigned int size = outputs.size();
     for(unsigned int i = 0; i < size; ++i)
-        outputs[i] -> backPropogation(training[i],learningRate);
+        outputs[i] -> backPropogation(learningRate,training[i]);
 
     for(int i = hiddenLayer.size() - 1; i >= 0; --i)
         for(unsigned int j = 0; j < hiddenLayer[i].size(); ++j)

@@ -84,19 +84,23 @@ int main( int argc, char * argv[])
     testNetwork.loadFromFile("../TestGenome.charzar");
 
     std::vector<double> val {0.5,0.25};
+    std::vector<double> out;
     testNetwork.setInputs(val);
-    val[0] = 0.33;
-    val[1] = 0.42;
+    val[0] = 0.01;
+    val[1] = 0.99;
 
     testNetwork.setTraining(val);
     testNetwork.runForward();
 
     std::cout << "Total Error: " << testNetwork.getLMSError() << std::endl;
-    for(unsigned int i = 0; i < 1000; ++i)
+    for(unsigned int i = 0; i < 10000; ++i)
     {
-        testNetwork.gradientDecent(0.5);
+        testNetwork.gradientDecent(0.9);
         testNetwork.runForward();
     }
+    out = testNetwork.getNetworkOutput();
+    for(unsigned int i = 0; i < out.size(); ++i)
+        std::cout << "out: " << out[i] << " target " << val[i] << std::endl;
     std::cout << "Total Error: " << testNetwork.getLMSError() << std::endl;
 
     return 0;

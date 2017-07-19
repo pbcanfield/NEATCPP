@@ -21,10 +21,10 @@ Weight::~Weight()
 
 void Weight::calculateGradient(double eTotal, double outDer, double learningRate)
 {
-    updatedWeight = weight - learningRate *
+    updatedWeight = weight - (learningRate *
                              bConnection -> value() *
                              eTotal *
-                             outDer;
+                             outDer);
 }
 
 void Weight::update()
