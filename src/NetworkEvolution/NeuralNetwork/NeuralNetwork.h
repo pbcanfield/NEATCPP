@@ -42,6 +42,8 @@ private:
     std::vector<Node*> & getLayer(unsigned int);
     void lockFunc(std::atomic<unsigned int> &, unsigned int);
 
+    void updateGene(Node *, unsigned int &);
+    void updateBias(Node *, unsigned int &);
 
     std::vector<Node*> inputs;
     std::vector<std::vector<Node*>> hiddenLayer;

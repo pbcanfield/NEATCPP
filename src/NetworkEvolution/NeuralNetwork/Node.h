@@ -26,7 +26,6 @@ public:
     void backPropogation(double,double);
     void updateWeights();
 
-
     // Modifying the network
     void removeFConnections();
     void removeBConnections();
@@ -35,9 +34,14 @@ public:
     // Getter
     Weight * getLastForward();
     Weight * getLastBackwards();
+    Weight * getFrowardWeight(unsigned int pos) { return fConnections[pos]; }
+
     double & value() { return val; }
     double & bias() { return b; }
     double getDelta() { return delta; }
+
+    unsigned int getForwardSize() { return fConnections.size(); }
+    bool isBiasEnabled();
 private:
 
     double sigmoidDerivative(double);

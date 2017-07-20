@@ -264,7 +264,28 @@ void NeuralNetwork::gradientDecent(double learningRate)
  */
 void NeuralNetwork::saveNetwork(std::string name)
 {
-    name += ".charzar"; //maybe dont do it this way
+    if(name.find(".charzar") == std::string::npos)
+        name += ".charzar"; //maybe dont do it this way
+
+
+    //Update Genes and Biases in the Genome.
+    unsigned int gCount = 0, bCount = 0;
+    for(auto & node : inputs)
+    {
+        updateGene(node,gCount);
+        updateBias(node,bCount);
+    }
+    for(auto & vec : hiddenLayer)
+    {
+        for(auto & node : vec)
+        {
+            updateGene(node,gCount);
+            updateBias(node,bCount);
+        }
+    }
+    for(auto & node : outputs)
+        updateBias(node,bCount);
+
     dna -> saveGenome(name);
 }
 
@@ -408,5 +429,24 @@ void NeuralNetwork::lockFunc(std::atomic<unsigned int> & current, unsigned int t
             go = true;
         else
             std::this_thread::yield();
+    }
+}
+
+void NeuralNetwork::updateGene(Node * node, unsigned int & gCount)
+{
+    unsigned int size = node -> getForwardSize();
+    for(unsigned int i = 0; i < size; ++i)
+    {
+        dna -> getGene(gCount).weight = node -> getFrowardWeight(i) -> value();
+        ++gCount;
+    }
+}
+
+void NeuralNetwork::updateBias(Node * node, unsigned int & bCount)
+{
+    if(node -> isBiasEnabled())
+    {
+        dna -> getBias(bCount).bias = node -> bias();
+        ++bCount;
     }
 }

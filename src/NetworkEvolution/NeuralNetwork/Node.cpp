@@ -114,3 +114,8 @@ double Node::sigmoidActivation(double x)
 {
     return 1.0 / (1 + pow(M_E,x * -1));
 }
+
+bool Node::isBiasEnabled()
+{
+    return b == 0 ? false:true;
+}

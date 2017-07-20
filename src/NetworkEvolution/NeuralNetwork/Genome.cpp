@@ -146,7 +146,7 @@ void Genome::addBias(Bias info)
     biasInfo.push_back(info);
 }
 
-Bias Genome::getBias(unsigned int pos)
+Bias & Genome::getBias(unsigned int pos)
 {
     return biasInfo[pos];
 }
@@ -176,7 +176,7 @@ std::vector<Bias> Genome::getBiasVector()
     return biasInfo;
 }
 
-Gene Genome::getGene(unsigned int pos)
+Gene & Genome::getGene(unsigned int pos)
 {
      return geneticCode[pos];
 }

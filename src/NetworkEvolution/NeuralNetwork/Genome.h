@@ -28,8 +28,8 @@ public:
 
     std::vector<Gene> getGenes();
     std::vector<Bias> getBiasVector();
-	Gene getGene(unsigned int);
-    Bias getBias(unsigned int);
+	Gene & getGene(unsigned int);
+    Bias & getBias(unsigned int);
 	unsigned int getGenomeSize();
     unsigned int getBiasSize();
 
