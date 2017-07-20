@@ -81,7 +81,6 @@ void Genome::saveGenome(std::string dir)
           charizard.write((char*)&gene.inID,INT);
           charizard.write((char*)&gene.outID,INT);
           charizard.write((char*)&gene.weight,DOUBLE);
-          charizard.write((char*)&gene.enabled,BOOL);
           charizard.write((char*)&gene.generation,INT);
      }
 
@@ -128,7 +127,6 @@ void Genome::loadFromFile(std::string dir)
                cry.read((char*)&gTemp.inID,INT);
                cry.read((char*)&gTemp.outID,INT);
                cry.read((char*)&gTemp.weight,DOUBLE);
-               cry.read((char*)&gTemp.enabled,BOOL);
                cry.read((char*)&gTemp.generation,INT);
                geneticCode.push_back(gTemp);
           }

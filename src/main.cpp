@@ -27,55 +27,46 @@ int main( int argc, char * argv[])
     gene.inID = 0;
     gene.outID = 2;
     gene.weight = 1;
-    gene.enabled = true;
     code.addGene(gene);
     //-----2-----
     gene.inID = 1;
     gene.outID = 3;
     gene.weight = 1;
-    gene.enabled = true;
     code.addGene(gene);
     //-----3-----
     gene.inID = 1;
     gene.outID = 4;
     gene.weight = 1;
-    gene.enabled = true;
     code.addGene(gene);
     //-----4-----
     gene.inID = 2;
     gene.outID = 5;
     gene.weight = 1;
-    gene.enabled = true;
     code.addGene(gene);
     //-----5-----
     gene.inID = 3;
     gene.outID = 5;
     gene.weight = 1;
-    gene.enabled = true;
     code.addGene(gene);
     //-----6-----
     gene.inID = 4;
     gene.outID = 6;
     gene.weight = 1;
-    gene.enabled = true;
     code.addGene(gene);
     //-----7-----
     gene.inID = 5;
     gene.outID = 7;
     gene.weight = 1;
-    gene.enabled = true;
     code.addGene(gene);
     //-----8-----
     gene.inID = 5;
     gene.outID = 8;
     gene.weight = 1;
-    gene.enabled = true;
     code.addGene(gene);
     //-----9-----
     gene.inID = 6;
     gene.outID = 8;
     gene.weight = 1;
-    gene.enabled = true;
     code.addGene(gene);
 
     code.saveGenome("../TestGenome.charzar");

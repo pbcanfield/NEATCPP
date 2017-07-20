@@ -47,7 +47,6 @@ private:
 
 	const unsigned int INT = sizeof(int);
 	const unsigned int DOUBLE = sizeof(double);
-	const unsigned int BOOL = sizeof(bool);
 };
 
 #endif
