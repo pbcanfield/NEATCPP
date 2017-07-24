@@ -1,7 +1,12 @@
+/**
+ * Author: Pete Canfield
+ * Date: 2017-7-19
+ */
+
 #include "NeuralNetwork.h"
 
 /**
- * This is the defualt constructor that sets thegeneration to zero
+ * This is the defualt constructor that sets the generation to zero
  * and allocates the memory for the genome of this Neural Network.
  */
 NeuralNetwork::NeuralNetwork()
@@ -44,6 +49,12 @@ NeuralNetwork::NeuralNetwork(Genome code)
  */
 NeuralNetwork::~NeuralNetwork()
 {
+
+    if(isVisualized)
+    {
+        vThread -> join();
+        delete vThread;
+    }
     //Delete the genome.
     delete dna;
 
@@ -104,15 +115,11 @@ void NeuralNetwork::updateStructure()
     //Connect structure based on the genes in the genome and add the correct weights.
     unsigned int numConnections = dna -> getGenes().size();
     Gene currentGene;
-    Node * first;
-    Node * last;
     for(unsigned int i = 0; i < numConnections; ++i)
     {
         currentGene = dna -> getGene(i);
-        first = findNodeWithID(currentGene.inID);
-        last = findNodeWithID(currentGene.outID);
-        first -> addForward(last,first,currentGene.weight);
-        last -> addBackwards(first -> getLastForward());
+        addWeight(findNodeWithID(currentGene.inID),findNodeWithID(currentGene.outID),
+                                 currentGene.weight);
     }
 
     //Could optimize this bit but I dont know if its worth the memory overhead
@@ -123,27 +130,103 @@ void NeuralNetwork::updateStructure()
 
 }
 
-
-void NeuralNetwork::mutate()
+void NeuralNetwork::mutateAddWeight(unsigned int nodeOne, unsigned int nodeTwo)
 {
-
+    //Change 1 to a random weight later.
+    Gene connection;
+    connection.inID = nodeOne;
+    connection.outID = nodeTwo;
+    connection.weight = 1;
+    connection.generation = generation;
+    addWeight(findNodeWithID(nodeOne),findNodeWithID(nodeTwo),1);
+    dna -> addGene(connection);
+    ++generation;
 }
 
+void NeuralNetwork::mutateAddNode(unsigned int nodeOne, unsigned int nodeTwo)
+{
+
+    unsigned int layer = findLayerFromNodeID(nodeOne);
+    unsigned int layerDiff = findLayerFromNodeID(nodeTwo) - layer;
+    if(layerDiff % 2 != 0)
+    {
+        std::vector<Node *> _layer;
+        hiddenLayer.insert(hiddenLayer.begin() + layer,_layer);
+        dna -> insertHidden(layer);
+    }
+    else
+        dna -> addHidden(layer);
+
+    Node * first = findNodeWithID(nodeOne);
+    Node * last = findNodeWithID(nodeTwo);
+
+    hiddenLayer[layer].push_back(new Node());
+    Node * middle = hiddenLayer[layer].back();
+    //Change 1.0 to a random number.
+
+    double w1 = 1.0, w2 = 1.0;
+
+    addWeight(first, middle, w1);
+    addWeight(middle, last, w2);
+
+    Gene connection;
+    connection.generation = generation;
+    unsigned int firstID = findIDWithNode(first);
+    unsigned int medID = findIDWithNode(middle);
+    unsigned int lastID = findIDWithNode(last);
+
+    dna -> updateConnectionStructure(medID);
+    dna -> removeConnection(firstID,lastID);
+
+    connection.inID = firstID;
+    connection.outID = medID;
+    connection.weight = w1;
+    dna -> addGene(connection);
+    connection.inID = medID;
+    connection.outID = lastID;
+    connection.weight = w2;
+    dna -> addGene(connection);
+    ++generation;
+}
+
+void NeuralNetwork::mutateAddBias(unsigned int node)
+{
+    Bias bias;
+    //Again change 1 to a random number.
+    double rBias = 1.0;
+    bias.node = node;
+    bias.bias = rBias;
+    bias.generation = generation;
+    findNodeWithID(node) -> bias() = rBias;
+    ++generation;
+}
+
+
+/**
+ * This function takes a vector of double values and sets the input layer nodes
+ * to the value of the input vector. If the input vector is not the size of the
+ * input layer the function will output an error message and not set the input
+ * layer to the input vector.
+ */
 void NeuralNetwork::setInputs(std::vector<double> input)
 {
-    if(input.size() != inputs.size())
+    if(input.size() == inputs.size())
+    {
+        unsigned int size = input.size();
+        for(unsigned int i = 0; i < size; ++i)
+            inputs[i] -> value() = input[i];
+    }
+    else
     {
         std::cout << "Could not set inputs becuase the input set was not the correct length"
             << std::endl;
     }
-    else
-    {
-        for(unsigned int i = 0; i < input.size(); ++i)
-            inputs[i] -> value() = input[i];
-
-    }
 }
-
+/**
+ * This is the member function that sets the training vector of the Neural Network.
+ * The function will only set the training vector if it matches the length of
+ * the output layer.
+ */
 void NeuralNetwork::setTraining(std::vector<double> traingingVector)
 {
     if(traingingVector.size() == outputs.size())
@@ -154,23 +237,24 @@ void NeuralNetwork::setTraining(std::vector<double> traingingVector)
 }
 
 /**
- This is the member function that is responisble for running
- the single threaded forward propogation for the
- neural network.
+ * This is the member function that is responisble for running
+ * the single threaded forward propogation for the
+ * neural network.
  */
-
 void NeuralNetwork::runForward()
 {
     //THANKS KRITIKA
-    for (auto & node : hiddenLayer[0])
-        node -> calculate();
+    if (hiddenLayer.size() > 0)
+    {
+        for (auto & node : hiddenLayer[0])
+            node -> calculate();
 
-    unsigned int size = hiddenLayer.size();
+        unsigned int size = hiddenLayer.size();
 
-    for(unsigned int i = 1; i < size; ++i)
-        for(unsigned int j = 0; j < hiddenLayer[i].size(); ++j)
-            hiddenLayer[i][j] -> calculate();
-
+        for(unsigned int i = 1; i < size; ++i)
+            for(unsigned int j = 0; j < hiddenLayer[i].size(); ++j)
+                hiddenLayer[i][j] -> calculate();
+    }
     for (auto & node: outputs)
         node -> calculate();
 }
@@ -178,7 +262,7 @@ void NeuralNetwork::runForward()
 /**
  * This is the function that is responisble for handling
  * the multithreading that runs the forward propogtion
- * for the neural network.
+ * for the Neural Network.
  */
 void NeuralNetwork::runForward(unsigned int numThreads)
 {
@@ -227,15 +311,26 @@ void NeuralNetwork::runForward(unsigned int numThreads)
     }
 
 }
-
+/**
+ * This is a member function that returns the least mean squared error of the
+ * entire Neural Network. It is calculated by taking the sum of the square of the
+ * difference between the expected and the output across the entre training and
+ * output vector.
+ */
 double NeuralNetwork::getLMSError()
 {
-    unsigned int size = outputs.size();
+
+
     double sum = 0;
-
-    for (unsigned int i = 0; i < size; ++i)
-        sum += 0.5 * pow(training[i] - outputs[i] -> value(),2);
-
+    if(training.size() > 0)
+    {
+        unsigned int size = outputs.size();
+        for (unsigned int i = 0; i < size; ++i)
+            sum += 0.5 * pow(training[i] - outputs[i] -> value(),2);
+    }
+    else
+        std::cout << "The examples have not been set, LMS can't be calculated"
+                  << std::endl;
     return sum;
 }
 
@@ -249,12 +344,13 @@ void NeuralNetwork::gradientDecent(double learningRate)
         for(unsigned int j = 0; j < hiddenLayer[i].size(); ++j)
             hiddenLayer[i][j] -> backPropogation(learningRate);
 
-    for(auto & vec : hiddenLayer)
-        for(auto & node : vec)
-            node -> updateWeights();
-
     for(auto & node : outputs)
         node -> updateWeights();
+
+    for(int i = hiddenLayer.size() - 1; i >= 0; --i)
+        for(unsigned int j = 0; j < hiddenLayer[i].size(); ++j)
+            hiddenLayer[i][j] -> updateWeights();
+
 }
 
 /**
@@ -312,6 +408,13 @@ std::vector<double> NeuralNetwork::getNetworkOutput()
     return value;
 }
 
+void NeuralNetwork::visualize(unsigned int x, unsigned int y)
+{
+    isVisualized = true;
+    //541549
+    vThread = new std::thread(&NeuralNetwork::displayWindow,this,*dna,x,y);
+}
+
 
 /**
  * This is a function that takes a linear identification number and searches
@@ -348,6 +451,46 @@ Node * NeuralNetwork::findNodeWithID(unsigned int ID)
 
     ID -= inputs.size() + hiddenLayerSize;
     return outputs[ID];
+}
+
+unsigned int NeuralNetwork::findIDWithNode(Node * target)
+{
+    bool found = false;
+    unsigned int ID;
+    unsigned int size = inputs.size();
+    unsigned int count = size;
+
+    for(unsigned int i = 0; i < size && !found; ++i)
+    {
+        if (inputs[i] == target)
+        {
+            found = true;
+            ID = i;
+        }
+    }
+    size = hiddenLayer.size();
+    for(unsigned int i = 0; i < size && !found; ++i)
+    {
+        for(unsigned int j = 0; j < hiddenLayer[i].size() && !found; ++j)
+        {
+            if(hiddenLayer[i][j] == target)
+            {
+                found = true;
+                ID = count;
+            }
+            ++count;
+        }
+    }
+    size = outputs.size();
+    for(unsigned int i = 0; i < size && !found; ++i)
+    {
+        if(outputs[i] == target)
+        {
+            found = true;
+            ID = count;
+        }
+    }
+    return ID;
 }
 
 
@@ -420,6 +563,10 @@ std::vector<Node*> & NeuralNetwork::getLayer(unsigned int pos)
     return outputs;
 }
 
+/**
+ * This function locks a specific thread until a target variable reaches a
+ * a certain value.
+ */
 void NeuralNetwork::lockFunc(std::atomic<unsigned int> & current, unsigned int target)
 {
     bool go = false;
@@ -432,6 +579,30 @@ void NeuralNetwork::lockFunc(std::atomic<unsigned int> & current, unsigned int t
     }
 }
 
+void NeuralNetwork::displayWindow(Genome code, unsigned int winX, unsigned int winY)
+{
+    sf::RenderWindow window(sf::VideoMode(winX,winY),"Neural Network Visualization");
+
+
+    while(window.isOpen())
+    {
+        sf::Event event;
+        while(window.pollEvent(event))
+        {
+            if(event.type == sf::Event::Closed)
+                window.close();
+        }
+
+        window.clear();
+
+        window.display();
+    }
+}
+
+/**
+ * This function updates a Gene within the Genome of the Neural Network and
+ * is called from the saveNetwork function.
+ */
 void NeuralNetwork::updateGene(Node * node, unsigned int & gCount)
 {
     unsigned int size = node -> getForwardSize();
@@ -442,6 +613,10 @@ void NeuralNetwork::updateGene(Node * node, unsigned int & gCount)
     }
 }
 
+/**
+ * This function updates a Bias within the Genome of the Neural Network and
+ * is called from the saveNetwork function.
+ */
 void NeuralNetwork::updateBias(Node * node, unsigned int & bCount)
 {
     if(node -> isBiasEnabled())
@@ -449,4 +624,44 @@ void NeuralNetwork::updateBias(Node * node, unsigned int & bCount)
         dna -> getBias(bCount).bias = node -> bias();
         ++bCount;
     }
+}
+
+/**
+ * This is a helper function that adds a weight and connection between two nodes.
+ * It takes a first node pointer and a second node pointer and a weight value.
+ */
+
+void NeuralNetwork::addWeight(Node * first, Node * last, double weight)
+{
+    first -> addForward(last,first,weight);
+    last -> addBackwards(first -> getLastForward());
+}
+/**
+ * This is a helper funtion that searches the topology of the network ad returns
+ * the layer number that a node belongs to. It takes an input node ID and returns
+ * a layer number.
+ */
+
+unsigned int NeuralNetwork::findLayerFromNodeID(unsigned int ID)
+{
+    unsigned int nInput = inputs.size();
+    unsigned int hSize = hiddenLayer.size();
+
+
+    if(ID < nInput)
+    {
+        return 0;
+    }
+    else
+    {
+        unsigned int sum = nInput;
+        for(unsigned int i = 0; i < hSize; ++i)
+        {
+            sum += hiddenLayer[i].size();
+            if(ID < sum)
+                return i + 1;
+
+        }
+    }
+    return hSize + 1;
 }

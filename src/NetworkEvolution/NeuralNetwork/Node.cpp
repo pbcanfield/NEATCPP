@@ -45,6 +45,30 @@ void Node::addBackwards(Weight * weight)
     bConnections.push_back(weight);
 }
 
+void Node::removeConnection(Node * nodeOut)
+{
+    Node * testing;
+    for(unsigned int i = 0; i < fConnections.size(); ++i)
+    {
+        testing = fConnections[i] -> fNode();
+        if(testing == nodeOut)
+        {
+            for(unsigned int j = 0; j < testing -> getBackWeightSize(); ++j)
+                if(testing -> getBackWeight(j) == fConnections[i])
+                    testing -> removeBackPointer(j);
+
+            delete fConnections[i];
+            fConnections.erase(fConnections.begin() + i);
+            return;
+        }
+    }
+}
+
+void Node::removeBackPointer(unsigned int pos)
+{
+    bConnections.erase(bConnections.begin() + pos);
+}
+
 
 /* This function is used to connect up the network.
  * Returns the last connection made forwards.
@@ -105,7 +129,7 @@ void Node::backPropogation(double learningRate, double target)
 
 void Node::updateWeights()
 {
-    for(auto & weight : fConnections)
+    for(auto & weight : bConnections)
         weight -> update();
 }
 

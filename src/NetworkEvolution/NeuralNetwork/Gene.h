@@ -12,5 +12,6 @@ struct Bias
 {
 	double bias;
 	unsigned int node;
+	int generation;
 };
 #endif

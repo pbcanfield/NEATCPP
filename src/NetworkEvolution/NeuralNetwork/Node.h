@@ -31,10 +31,16 @@ public:
     void removeBConnections();
     void addForward(Node *, Node *, double=0);
     void addBackwards(Weight *);
+    void removeConnection(Node *);
+    void removeBackPointer(unsigned int pos);
+
     // Getter
     Weight * getLastForward();
     Weight * getLastBackwards();
     Weight * getFrowardWeight(unsigned int pos) { return fConnections[pos]; }
+    Weight * getBackWeight(unsigned int pos) { return bConnections[pos]; }
+
+    unsigned int getBackWeightSize() { return bConnections.size(); }
 
     double & value() { return val; }
     double & bias() { return b; }
@@ -44,7 +50,6 @@ public:
     bool isBiasEnabled();
 private:
 
-    double sigmoidDerivative(double);
     double sigmoidActivation(double);
 
     // These are all the connections of the nodes, the weights will act as a middleman

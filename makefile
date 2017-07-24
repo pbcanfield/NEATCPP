@@ -1,5 +1,5 @@
 NEAT:	NetworkManager.o Genome.o NeuralNetwork.o Node.o Weight.o main.o
-	g++ -Wall -g -std=c++14 obj/Genome.o obj/Node.o obj/NeuralNetwork.o obj/NetworkManager.o obj/Weight.o  obj/main.o -o exec/NEAT
+	g++ -Wall -g -std=c++14 obj/Genome.o obj/Node.o obj/NeuralNetwork.o obj/NetworkManager.o obj/Weight.o  obj/main.o -lsfml-graphics -lsfml-window -lsfml-system -o exec/NEAT
 
 main.o:	src/main.cpp
 	g++ -Wall -g -std=c++14 -pthread -c src/main.cpp -o obj/main.o

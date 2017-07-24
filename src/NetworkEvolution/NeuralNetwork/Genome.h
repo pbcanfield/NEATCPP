@@ -11,15 +11,19 @@ class Genome
 {
 public:
 	Genome();
+	Genome(unsigned int, unsigned int);
 	Genome(std::string);
 	void addGene(Gene);
     void addBias(Bias);
 	void setInput(unsigned int);
 	void setHidden(std::vector<unsigned int>);
 	void setOutput(unsigned int);
+	void updateConnectionStructure(unsigned int);
+	void removeConnection(unsigned int, unsigned int);
 
 	void addInput();
 	void addHidden(unsigned int);
+	void insertHidden(unsigned int);
 	void addOutput();
 
 	void saveGenome(std::string);
@@ -38,6 +42,8 @@ public:
 	unsigned int getOutput();
 
 private:
+
+
 
 	std::vector<Gene> geneticCode;
     std::vector<Bias> biasInfo;

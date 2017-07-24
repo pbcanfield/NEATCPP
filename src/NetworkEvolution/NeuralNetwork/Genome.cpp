@@ -4,10 +4,28 @@
  * Author: Pete Canfield & Daiwei Chen
  * Date: 2017-6-15
  */
-
 Genome::Genome()
 {
 
+}
+
+
+Genome::Genome(unsigned int nInput, unsigned int nOutput)
+{
+    input = nInput;
+    output = nOutput;
+    Gene _gene;
+    for(unsigned int i = 0; i < nInput; ++i)
+    {
+        for(unsigned int j = 0; j < nOutput; ++j)
+        {
+            //Generate a random weight here, needs to be implamented in the future.
+            _gene.weight = 1.0;
+            _gene.inID = i;
+            _gene.outID = j;
+            _gene.generation = 0;
+        }
+    }
 }
 
 Genome::Genome(std::string dir)
@@ -38,6 +56,12 @@ void Genome::addInput()
 void Genome::addHidden(unsigned int pos)
 {
      ++hiddenLayer[pos];
+
+
+}
+void Genome::insertHidden(unsigned int layer)
+{
+    hiddenLayer.insert(hiddenLayer.begin() + layer,1);
 }
 
 void Genome::addOutput()
@@ -74,6 +98,7 @@ void Genome::saveGenome(std::string dir)
      {
          charizard.write((char*)&bias.bias,DOUBLE);
          charizard.write((char*)&bias.node,INT);
+         charizard.write((char*)&bias.generation,INT);
      }
 
      for(auto & gene: geneticCode)
@@ -119,6 +144,7 @@ void Genome::loadFromFile(std::string dir)
           {
               cry.read((char*)&bTemp.bias,DOUBLE);
               cry.read((char*)&bTemp.node,INT);
+              cry.read((char*)&bTemp.generation,INT);
               biasInfo.push_back(bTemp);
           }
           Gene gTemp;
@@ -197,4 +223,30 @@ std::vector<unsigned int> Genome::getHidden()
 unsigned int Genome::getOutput()
 {
      return output;
+}
+
+void Genome::updateConnectionStructure(unsigned int newNodeID)
+{
+    //This can probably be made way more efficient.
+    for(auto & gene : geneticCode)
+    {
+        if(gene.inID >= newNodeID)
+            ++gene.inID;
+        if(gene.outID >= newNodeID)
+            ++gene.outID;
+    }
+}
+
+void Genome::removeConnection(unsigned int in ,unsigned int out)
+{
+    unsigned int size = geneticCode.size();
+    bool found = false;
+    for(unsigned int i = 0; i < size && !found; ++i)
+    {
+        if(geneticCode[i].inID == in && geneticCode[i].outID == out)
+        {
+            found = true;
+            geneticCode.erase(geneticCode.begin() + i);
+        }
+    }
 }
