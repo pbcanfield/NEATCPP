@@ -115,7 +115,7 @@ void NeuralNetwork::updateStructure()
 
 
     //Connect structure based on the genes in the genome and add the correct weights.
-    unsigned int numConnections = dna -> getGenes().size();
+    unsigned int numConnections = dna -> getGenomeSize();
     Gene currentGene;
     for(unsigned int i = 0; i < numConnections; ++i)
     {

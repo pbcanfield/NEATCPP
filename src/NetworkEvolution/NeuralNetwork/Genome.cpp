@@ -120,7 +120,7 @@ void Genome::updateConnectionStructure(unsigned int newNodeID)
     for(auto & bias : biasInfo)
     {
         if (bias.node >= newNodeID)
-            ++bais.node;
+            ++bias.node;
     }
 }
 
