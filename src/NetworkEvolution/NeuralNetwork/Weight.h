@@ -1,3 +1,7 @@
+/**
+ * Author: Pete Canfield & Daiwei Chen
+ * Date: 2017-7-28
+ */
 #ifndef WEIGHT_H
 #define WEIGHT_H
 
