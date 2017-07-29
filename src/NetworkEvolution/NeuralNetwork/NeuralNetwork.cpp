@@ -2,8 +2,8 @@
  * Author: Pete Canfield
  * Date: 2017-7-19
  */
-
 #include "NeuralNetwork.h"
+
 
 /**
  * This is the defualt constructor that sets the generation to zero
@@ -14,6 +14,7 @@ NeuralNetwork::NeuralNetwork()
     generation = 0;
     dna = new Genome();
 }
+
 
 /**
  * This is a constructor that takes a string that will automatically
@@ -42,6 +43,7 @@ NeuralNetwork::NeuralNetwork(Genome code)
     dna -> copyIntoGenome(code);
     updateStructure();
 }
+
 
 /**
  * This destructor deallocates all the input, hidden and output
@@ -72,12 +74,12 @@ NeuralNetwork::~NeuralNetwork()
 
 }
 
+
 /**
  * This is a member function that is responisble for analyzing
  * the structure of the genome and for emmulating that structure
  * in the neural network.
  */
-
 void NeuralNetwork::updateStructure()
 {
 
@@ -130,6 +132,12 @@ void NeuralNetwork::updateStructure()
 
 }
 
+
+/**
+ * The mutateAddWeight member function takes in two node ID's and creates a Weight
+ * connection between them. When this happens the Genome of the NeuralNetwork
+ * is updated and global network generation number is incramented.
+ */
 void NeuralNetwork::mutateAddWeight(unsigned int nodeOne, unsigned int nodeTwo)
 {
     //Change 1 to a random weight later.
@@ -143,6 +151,18 @@ void NeuralNetwork::mutateAddWeight(unsigned int nodeOne, unsigned int nodeTwo)
     ++generation;
 }
 
+
+/**
+ * The mutateAddNode member function takes two node ID's and deletes the existing
+ * connection and weight between these ID's. The function then decides if a layer
+ * exists that the new intermediary node can be added to. If there is an existing
+ * layer that the node can be added to the node is pushed back to that Node *
+ * vector. Otherwise the member function inserts a new vector with one new Node *
+ * where it is nedded. The function then ajusts the genome correctly and updates
+ * the ID's that need to be altered in the Genome and inserts two new weights
+ * that connect to the new node and the previous first and last node. The
+ * generation number is then incramented.
+ */
 void NeuralNetwork::mutateAddNode(unsigned int nodeOne, unsigned int nodeTwo)
 {
 
@@ -189,6 +209,12 @@ void NeuralNetwork::mutateAddNode(unsigned int nodeOne, unsigned int nodeTwo)
     ++generation;
 }
 
+
+/**
+ * The mutateAddBias function adds a bias value to the node that corrilates
+ * with the supplied node ID. The Genome is updated and then the generation
+ * number is incramented.
+ */
 void NeuralNetwork::mutateAddBias(unsigned int node)
 {
     Bias bias;
@@ -222,6 +248,8 @@ void NeuralNetwork::setInputs(std::vector<double> input)
             << std::endl;
     }
 }
+
+
 /**
  * This is the member function that sets the training vector of the Neural Network.
  * The function will only set the training vector if it matches the length of
@@ -235,6 +263,7 @@ void NeuralNetwork::setTraining(std::vector<double> traingingVector)
         std::cout << "Could not set the training examples because the training set is not the correct length"
             << std::endl;
 }
+
 
 /**
  * This is the member function that is responisble for running
@@ -258,6 +287,7 @@ void NeuralNetwork::runForward()
     for (auto & node: outputs)
         node -> calculate();
 }
+
 
 /**
  * This is the function that is responisble for handling
@@ -311,6 +341,8 @@ void NeuralNetwork::runForward(unsigned int numThreads)
     }
 
 }
+
+
 /**
  * This is a member function that returns the least mean squared error of the
  * entire Neural Network. It is calculated by taking the sum of the square of the
@@ -334,6 +366,15 @@ double NeuralNetwork::getLMSError()
     return sum;
 }
 
+
+/**
+ * This is the algorithm that performs the gradient decent caluclations for
+ * backPropogation. All the math such as calculating the node deltas is handled
+ * by the Node class. This member function simply calls the corrisponding
+ * backPropogation function for each node. After the new weights are all
+ * calculated they are all applied after all gradient decent caluclations have
+ * been made.
+ */
 void NeuralNetwork::gradientDecent(double learningRate)
 {
     unsigned int size = outputs.size();
@@ -352,6 +393,7 @@ void NeuralNetwork::gradientDecent(double learningRate)
             hiddenLayer[i][j] -> updateWeights();
 
 }
+
 
 /**
  * This function saves the current genome to a charzar file.
@@ -399,6 +441,10 @@ void NeuralNetwork::loadFromFile(std::string dir)
 }
 
 
+/**
+ * This member function copies the values of the output nodes into a vector that
+ * is then returned. It is used to get the raw output of the network.
+ */
 std::vector<double> NeuralNetwork::getNetworkOutput()
 {
     std::vector<double> value;
@@ -408,10 +454,17 @@ std::vector<double> NeuralNetwork::getNetworkOutput()
     return value;
 }
 
+
+/**
+ * This is the Visualization function that currently (may be changed later)
+ * generates a simple visualization of the neural network that is not in real
+ * time. It would be easy enough to make the visualization update in real time
+ * it was not implamented this way in fear of data races and for convienence.
+ * Does not work on OS X due to a limition of the OS and SFML.
+ */
 void NeuralNetwork::visualize(unsigned int x, unsigned int y)
 {
     isVisualized = true;
-    //541549
     vThread = new std::thread(&NeuralNetwork::displayWindow,this,*dna,x,y);
 }
 
@@ -453,6 +506,12 @@ Node * NeuralNetwork::findNodeWithID(unsigned int ID)
     return outputs[ID];
 }
 
+
+/**
+ * This takes a Node * and returns the current node ID based on its placement in
+ * the network. It could probably be optimized which would leed to much better
+ * speed.
+ */
 unsigned int NeuralNetwork::findIDWithNode(Node * target)
 {
     bool found = false;
@@ -546,6 +605,7 @@ unsigned int NeuralNetwork::findNumInLayer(unsigned int layer)
     return getLayer(layer).size();
 }
 
+
 /**
  * This is a function that returns a layer at a specific position in the
  * Neural Network.
@@ -563,6 +623,7 @@ std::vector<Node*> & NeuralNetwork::getLayer(unsigned int pos)
     return outputs;
 }
 
+
 /**
  * This function locks a specific thread until a target variable reaches a
  * a certain value.
@@ -579,6 +640,12 @@ void NeuralNetwork::lockFunc(std::atomic<unsigned int> & current, unsigned int t
     }
 }
 
+
+/**
+ * This is the helper function that actually creates and displays the visualization
+ * of This neural network. This is not done yet as I couldnt program it on OS X
+ * do to a OS limition.
+ */
 void NeuralNetwork::displayWindow(Genome code, unsigned int winX, unsigned int winY)
 {
     sf::RenderWindow window(sf::VideoMode(winX,winY),"Neural Network Visualization");
@@ -599,6 +666,7 @@ void NeuralNetwork::displayWindow(Genome code, unsigned int winX, unsigned int w
     }
 }
 
+
 /**
  * This function updates a Gene within the Genome of the Neural Network and
  * is called from the saveNetwork function.
@@ -613,6 +681,7 @@ void NeuralNetwork::updateGene(Node * node, unsigned int & gCount)
     }
 }
 
+
 /**
  * This function updates a Bias within the Genome of the Neural Network and
  * is called from the saveNetwork function.
@@ -626,22 +695,23 @@ void NeuralNetwork::updateBias(Node * node, unsigned int & bCount)
     }
 }
 
+
 /**
  * This is a helper function that adds a weight and connection between two nodes.
  * It takes a first node pointer and a second node pointer and a weight value.
  */
-
 void NeuralNetwork::addWeight(Node * first, Node * last, double weight)
 {
     first -> addForward(last,first,weight);
     last -> addBackwards(first -> getLastForward());
 }
+
+
 /**
  * This is a helper funtion that searches the topology of the network ad returns
  * the layer number that a node belongs to. It takes an input node ID and returns
  * a layer number.
  */
-
 unsigned int NeuralNetwork::findLayerFromNodeID(unsigned int ID)
 {
     unsigned int nInput = inputs.size();

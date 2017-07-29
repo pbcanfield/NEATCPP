@@ -1,5 +1,8 @@
+/*
+ * Author: Pete Canfield & Daiwei Chen
+ * Date: 2017-6-15
+ */
 #ifndef GENOME_H
-
 #define GENOME_H
 
 #include <vector>
@@ -30,7 +33,7 @@ public:
 	void loadFromFile(std::string);
     void copyIntoGenome(Genome &);
 
-    std::vector<Gene> getGenes();
+    std::vector<Gene> getGeneVector();
     std::vector<Bias> getBiasVector();
 	Gene & getGene(unsigned int);
     Bias & getBias(unsigned int);
@@ -42,9 +45,6 @@ public:
 	unsigned int getOutput();
 
 private:
-
-
-
 	std::vector<Gene> geneticCode;
     std::vector<Bias> biasInfo;
 	unsigned int input;
@@ -54,5 +54,4 @@ private:
 	const unsigned int INT = sizeof(int);
 	const unsigned int DOUBLE = sizeof(double);
 };
-
 #endif
