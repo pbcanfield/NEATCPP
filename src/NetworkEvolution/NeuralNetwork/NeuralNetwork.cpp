@@ -223,6 +223,7 @@ void NeuralNetwork::mutateAddBias(unsigned int node)
     bias.node = node;
     bias.bias = rBias;
     bias.generation = generation;
+    dna -> addBias(bias);
     findNodeWithID(node) -> bias() = rBias;
     ++generation;
 }

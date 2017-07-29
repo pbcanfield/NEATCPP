@@ -73,7 +73,7 @@ int main( int argc, char * argv[])
 
 
     NeuralNetwork testNetwork;
-    testNetwork.loadFromFile("../blueprints/network.charzar");
+    testNetwork.loadFromFile("../blueprints/TestGenome.charzar");
 
     std::vector<double> val {0.3,0.7};
     std::vector<double> out;
@@ -96,12 +96,14 @@ int main( int argc, char * argv[])
         testNetwork.gradientDecent(0.01);
         testNetwork.runForward();
     }
-    
+
     out = testNetwork.getNetworkOutput();
     std::cout << "\nAfter optimization\n" <<std::endl;
     for(unsigned int i = 0; i < out.size(); ++i)
         std::cout << "out: " << out[i] << " target " << val[i] << std::endl;
     std::cout << "Total Error: " << testNetwork.getLMSError() << std::endl;
+
+
 
     return 0;
 }
