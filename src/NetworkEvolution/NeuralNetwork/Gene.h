@@ -13,7 +13,7 @@
  */
 struct Gene
 {
-	int inID, outID;
+	unsigned int inID, outID;
 	double weight;
 	int generation;
 };

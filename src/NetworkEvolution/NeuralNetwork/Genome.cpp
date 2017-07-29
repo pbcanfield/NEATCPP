@@ -34,6 +34,7 @@ Genome::Genome(unsigned int nInput, unsigned int nOutput)
             _gene.inID = i;
             _gene.outID = j;
             _gene.generation = 0;
+            geneticCode.push_back(_gene);
         }
     }
 }
