@@ -1,3 +1,7 @@
+/**
+ * Author: Pete Canfield & Daiwei Chen
+ * Date: 2017-7-28
+ */
 #ifndef WEIGHT_H
 #define WEIGHT_H
 
@@ -11,7 +15,7 @@ public:
     Weight(Node *, Node *, double = 0);
     ~Weight();
 
-    void calculateGradient(double,double,double);
+    void calculateGradient(double,double);
     void update();
 
     Node *& fNode() {return fConnection;}

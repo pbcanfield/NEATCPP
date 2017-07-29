@@ -26,24 +26,30 @@ public:
     void backPropogation(double,double);
     void updateWeights();
 
-
     // Modifying the network
     void removeFConnections();
     void removeBConnections();
     void addForward(Node *, Node *, double=0);
     void addBackwards(Weight *);
-    void setBiasPtr(double *);
+    void removeConnection(Node *);
+    void removeBackPointer(unsigned int pos);
 
     // Getter
     Weight * getLastForward();
     Weight * getLastBackwards();
+    Weight * getFrowardWeight(unsigned int pos) { return fConnections[pos]; }
+    Weight * getBackWeight(unsigned int pos) { return bConnections[pos]; }
+
+    unsigned int getBackWeightSize() { return bConnections.size(); }
+
     double & value() { return val; }
-    double * getBiasPtr() { return bias; }
-    double getOutDerivative() { return outDer; }
-    double getETotal() { return eTotal; }
+    double & bias() { return b; }
+    double getDelta() { return delta; }
+
+    unsigned int getForwardSize() { return fConnections.size(); }
+    bool isBiasEnabled();
 private:
 
-    double sigmoidDerivative(double);
     double sigmoidActivation(double);
 
     // These are all the connections of the nodes, the weights will act as a middleman
@@ -51,12 +57,11 @@ private:
     std::vector<Weight*> fConnections;
     std::vector<Weight*> bConnections;
 
-    // The value and sum
-    double val,eTotal,outDer;
+    // The value,bias and sum
+    double val,delta;
+    double b = 0;
 
 
-    //This is the bias value for the network.
-    double * bias = NULL;
 
 };
 
