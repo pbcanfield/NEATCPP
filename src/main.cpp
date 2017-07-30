@@ -69,11 +69,9 @@ int main( int argc, char * argv[])
     gene.weight = 1;
     code.addGene(gene);
 
-    code.saveGenome("../blueprints/TestGenome.charzar");
 
 
-    NeuralNetwork testNetwork;
-    testNetwork.loadFromFile("../blueprints/TestGenome.charzar");
+    NeuralNetwork testNetwork(code);
 
     std::vector<double> val {0.3,0.7};
     std::vector<double> out;
@@ -91,7 +89,9 @@ int main( int argc, char * argv[])
     for(unsigned int i = 0; i < out.size(); ++i)
         std::cout << "out: " << out[i] << " target " << val[i] << std::endl;
 
-    for(unsigned int i = 0; i < 100000000; ++i)
+    testNetwork.visualize(1000,500);
+
+    for(unsigned int i = 0; i < 10000; ++i)
     {
         testNetwork.gradientDecent(0.01);
         testNetwork.runForward();

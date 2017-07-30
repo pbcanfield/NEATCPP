@@ -466,7 +466,8 @@ std::vector<double> NeuralNetwork::getNetworkOutput()
 void NeuralNetwork::visualize(unsigned int x, unsigned int y)
 {
     isVisualized = true;
-    vThread = new std::thread(&NeuralNetwork::displayWindow,this,*dna,x,y);
+    vThread = new std::thread(&NeuralNetwork::displayWindow,this,x,y);
+
 }
 
 
@@ -647,13 +648,109 @@ void NeuralNetwork::lockFunc(std::atomic<unsigned int> & current, unsigned int t
  * of This neural network. This is not done yet as I couldnt program it on OS X
  * do to a OS limition.
  */
-void NeuralNetwork::displayWindow(Genome code, unsigned int winX, unsigned int winY)
+void NeuralNetwork::displayWindow(unsigned int winX, unsigned int winY)
 {
     sf::RenderWindow window(sf::VideoMode(winX,winY),"Neural Network Visualization");
+
+    unsigned int updateRate = 5; // how many seconds at the frameRate to update network.
+    unsigned int  frameRate = 60;
+
+    unsigned int limit = updateRate * frameRate;
+    unsigned int count = 0;
+
+    float xDistance,yDistance;
+
+    window.setFramerateLimit(frameRate);
+
+    std::vector<sf::CircleShape> nodes;
+    sf::VertexArray weights(sf::LinesStrip);
+    sf::CircleShape _shape;
 
 
     while(window.isOpen())
     {
+
+        if(count == 0)
+        {
+            //update the visualization
+            //Optimize this later.
+            float radius = 10;
+
+            _shape.setOrigin(radius,radius);
+            _shape.setRadius(radius);
+
+            unsigned int numLayers = dna -> getHidden().size() + 2;
+
+            xDistance = calcDistance(winX,numLayers,radius);
+
+            unsigned int numInput = dna -> getInput();
+            std::vector<unsigned int> topo = dna -> getHidden();
+            unsigned int numOutput = dna -> getOutput();
+
+            yDistance = calcDistance(winY,numInput,radius);
+            //Calculate the positions of the nodes.
+            _shape.setPosition(xDistance, yDistance + radius);
+            nodes.push_back(_shape);
+
+            for(unsigned int i = 1; i < numInput; ++i)
+            {
+                _shape.setPosition(xDistance, (i + 1) * yDistance + 2 * i * radius);
+                nodes.push_back(_shape);
+            }
+
+            // 2 + i * xDistance for x Pos
+            // if y is yDistance + radius
+            for(unsigned int i = 0; i < topo.size(); ++i)
+            {
+                for(unsigned int j = 0; j < topo[i]; ++j)
+                {
+                    yDistance = calcDistance(winY,topo[i],radius);
+
+                    if (j == 0) // Have to do it this way in case there are no hidden nodes.
+                    {
+                        _shape.setPosition(2 * xDistance + i * xDistance,
+                                           yDistance + radius);
+                        nodes.push_back(_shape);
+                    }
+                    else
+                    {
+                        _shape.setPosition(2 * xDistance + i * xDistance,
+                                          (j + 1) * yDistance + 2 * j * radius);
+                        nodes.push_back(_shape);
+                    }
+                }
+            }
+
+            yDistance = calcDistance(winY,numOutput,radius);
+
+            _shape.setPosition(xDistance * numLayers, yDistance + radius);
+            nodes.push_back(_shape);
+
+            for(unsigned int i = 1; i < numInput; ++i)
+            {
+                _shape.setPosition(xDistance * numLayers, (i + 1) * yDistance + 2 * i * radius);
+                nodes.push_back(_shape);
+            }
+
+            Gene _connection;
+            sf::Vector2f pos;
+            //Add the lines.
+            for(unsigned int i = 0; i < dna -> getGenomeSize(); ++i)
+            {
+                _connection = dna -> getGene(i);
+                pos = nodes[_connection.inID].getPosition();
+                weights.append(sf::Vector2f(pos.x,pos.y));
+                pos = nodes[_connection.outID].getPosition();
+                weights.append(sf::Vector2f(pos.x,pos.y));
+            }
+
+
+        }
+        if (count < limit)
+            ++count;
+        else
+            count = 0;
+
         sf::Event event;
         while(window.pollEvent(event))
         {
@@ -663,10 +760,20 @@ void NeuralNetwork::displayWindow(Genome code, unsigned int winX, unsigned int w
 
         window.clear();
 
+        window.draw(weights);
+
+        for(auto & shape : nodes)
+            window.draw(shape);
+
         window.display();
     }
 }
 
+
+float NeuralNetwork::calcDistance(unsigned int max, unsigned int num, float radius)
+{
+    return (max - 2.f * num * radius) / (num + 1);
+}
 
 /**
  * This function updates a Gene within the Genome of the Neural Network and
