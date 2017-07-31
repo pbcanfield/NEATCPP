@@ -466,6 +466,7 @@ std::vector<double> NeuralNetwork::getNetworkOutput()
 void NeuralNetwork::visualize(unsigned int x, unsigned int y)
 {
     isVisualized = true;
+    std::cout << "Launching window: press escape to exit" << std::endl;
     vThread = new std::thread(&NeuralNetwork::displayWindow,this,x,y);
 
 }
@@ -645,8 +646,7 @@ void NeuralNetwork::lockFunc(std::atomic<unsigned int> & current, unsigned int t
 
 /**
  * This is the helper function that actually creates and displays the visualization
- * of This neural network. This is not done yet as I couldnt program it on OS X
- * do to a OS limition.
+ * of This neural network.
  */
 void NeuralNetwork::displayWindow(unsigned int winX, unsigned int winY)
 {
@@ -666,7 +666,6 @@ void NeuralNetwork::displayWindow(unsigned int winX, unsigned int winY)
     sf::VertexArray weights(sf::LinesStrip);
     sf::CircleShape _shape;
 
-
     while(window.isOpen())
     {
 
@@ -674,6 +673,9 @@ void NeuralNetwork::displayWindow(unsigned int winX, unsigned int winY)
         {
             //update the visualization
             //Optimize this later.
+            nodes.clear();
+            weights.clear();
+
             float radius = 10;
 
             _shape.setOrigin(radius,radius);
@@ -698,14 +700,11 @@ void NeuralNetwork::displayWindow(unsigned int winX, unsigned int winY)
                 nodes.push_back(_shape);
             }
 
-            // 2 + i * xDistance for x Pos
-            // if y is yDistance + radius
             for(unsigned int i = 0; i < topo.size(); ++i)
             {
                 for(unsigned int j = 0; j < topo[i]; ++j)
                 {
                     yDistance = calcDistance(winY,topo[i],radius);
-
                     if (j == 0) // Have to do it this way in case there are no hidden nodes.
                     {
                         _shape.setPosition(2 * xDistance + i * xDistance,
@@ -726,7 +725,7 @@ void NeuralNetwork::displayWindow(unsigned int winX, unsigned int winY)
             _shape.setPosition(xDistance * numLayers, yDistance + radius);
             nodes.push_back(_shape);
 
-            for(unsigned int i = 1; i < numInput; ++i)
+            for(unsigned int i = 1; i < numOutput; ++i)
             {
                 _shape.setPosition(xDistance * numLayers, (i + 1) * yDistance + 2 * i * radius);
                 nodes.push_back(_shape);
@@ -756,6 +755,16 @@ void NeuralNetwork::displayWindow(unsigned int winX, unsigned int winY)
         {
             if(event.type == sf::Event::Closed)
                 window.close();
+
+            if (event.type == sf::Event::KeyPressed)
+            {
+                if (event.key.code == sf::Keyboard::Escape)
+                {
+                    std::cout << "Exiting vizualization" << std::endl;
+                    window.close();
+                }
+            }
+
         }
 
         window.clear();
@@ -770,6 +779,15 @@ void NeuralNetwork::displayWindow(unsigned int winX, unsigned int winY)
 }
 
 
+/**
+ * This is a worker function that caluclates the distance between either nodes or
+ * layers of nodes.
+ * @param  max    Either the x or y size of the window.
+ * @param  num    Either the number of layers or nodes
+ *                in the network.
+ * @param  radius The radius of the node.
+ * @return        The distance between either nodes or layers.
+ */
 float NeuralNetwork::calcDistance(unsigned int max, unsigned int num, float radius)
 {
     return (max - 2.f * num * radius) / (num + 1);
