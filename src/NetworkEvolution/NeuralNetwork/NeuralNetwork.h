@@ -53,8 +53,8 @@ private:
     unsigned int findLayerFromNodeID(unsigned int);
 
     void lockFunc(std::atomic<unsigned int> &, unsigned int);
-    void displayWindow(Genome,unsigned int, unsigned int);
-
+    void displayWindow(unsigned int, unsigned int);
+    float calcDistance(unsigned int, unsigned int, float);
     void updateGene(Node *, unsigned int &);
     void updateBias(Node *, unsigned int &);
 

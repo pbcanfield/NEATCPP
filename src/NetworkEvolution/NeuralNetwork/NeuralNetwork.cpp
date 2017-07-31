@@ -466,7 +466,9 @@ std::vector<double> NeuralNetwork::getNetworkOutput()
 void NeuralNetwork::visualize(unsigned int x, unsigned int y)
 {
     isVisualized = true;
-    vThread = new std::thread(&NeuralNetwork::displayWindow,this,*dna,x,y);
+    std::cout << "Launching window: press escape to exit" << std::endl;
+    vThread = new std::thread(&NeuralNetwork::displayWindow,this,x,y);
+
 }
 
 
@@ -644,29 +646,152 @@ void NeuralNetwork::lockFunc(std::atomic<unsigned int> & current, unsigned int t
 
 /**
  * This is the helper function that actually creates and displays the visualization
- * of This neural network. This is not done yet as I couldnt program it on OS X
- * do to a OS limition.
+ * of This neural network.
  */
-void NeuralNetwork::displayWindow(Genome code, unsigned int winX, unsigned int winY)
+void NeuralNetwork::displayWindow(unsigned int winX, unsigned int winY)
 {
     sf::RenderWindow window(sf::VideoMode(winX,winY),"Neural Network Visualization");
 
+    unsigned int updateRate = 5; // how many seconds at the frameRate to update network.
+    unsigned int  frameRate = 60;
+
+    unsigned int limit = updateRate * frameRate;
+    unsigned int count = 0;
+
+    float xDistance,yDistance;
+
+    window.setFramerateLimit(frameRate);
+
+    std::vector<sf::CircleShape> nodes;
+    sf::VertexArray weights(sf::LinesStrip);
+    sf::CircleShape _shape;
 
     while(window.isOpen())
     {
+
+        if(count == 0)
+        {
+            //update the visualization
+            //Optimize this later.
+            nodes.clear();
+            weights.clear();
+
+            float radius = 10;
+
+            _shape.setOrigin(radius,radius);
+            _shape.setRadius(radius);
+
+            unsigned int numLayers = dna -> getHidden().size() + 2;
+
+            xDistance = calcDistance(winX,numLayers,radius);
+
+            unsigned int numInput = dna -> getInput();
+            std::vector<unsigned int> topo = dna -> getHidden();
+            unsigned int numOutput = dna -> getOutput();
+
+            yDistance = calcDistance(winY,numInput,radius);
+            //Calculate the positions of the nodes.
+            _shape.setPosition(xDistance, yDistance + radius);
+            nodes.push_back(_shape);
+
+            for(unsigned int i = 1; i < numInput; ++i)
+            {
+                _shape.setPosition(xDistance, (i + 1) * yDistance + 2 * i * radius);
+                nodes.push_back(_shape);
+            }
+
+            for(unsigned int i = 0; i < topo.size(); ++i)
+            {
+                for(unsigned int j = 0; j < topo[i]; ++j)
+                {
+                    yDistance = calcDistance(winY,topo[i],radius);
+                    if (j == 0) // Have to do it this way in case there are no hidden nodes.
+                    {
+                        _shape.setPosition(2 * xDistance + i * xDistance,
+                                           yDistance + radius);
+                        nodes.push_back(_shape);
+                    }
+                    else
+                    {
+                        _shape.setPosition(2 * xDistance + i * xDistance,
+                                          (j + 1) * yDistance + 2 * j * radius);
+                        nodes.push_back(_shape);
+                    }
+                }
+            }
+
+            yDistance = calcDistance(winY,numOutput,radius);
+
+            _shape.setPosition(xDistance * numLayers, yDistance + radius);
+            nodes.push_back(_shape);
+
+            for(unsigned int i = 1; i < numOutput; ++i)
+            {
+                _shape.setPosition(xDistance * numLayers, (i + 1) * yDistance + 2 * i * radius);
+                nodes.push_back(_shape);
+            }
+
+            Gene _connection;
+            sf::Vector2f pos;
+            //Add the lines.
+            for(unsigned int i = 0; i < dna -> getGenomeSize(); ++i)
+            {
+                _connection = dna -> getGene(i);
+                pos = nodes[_connection.inID].getPosition();
+                weights.append(sf::Vector2f(pos.x,pos.y));
+                pos = nodes[_connection.outID].getPosition();
+                weights.append(sf::Vector2f(pos.x,pos.y));
+            }
+
+
+        }
+        if (count < limit)
+            ++count;
+        else
+            count = 0;
+
         sf::Event event;
         while(window.pollEvent(event))
         {
             if(event.type == sf::Event::Closed)
                 window.close();
+
+            if (event.type == sf::Event::KeyPressed)
+            {
+                if (event.key.code == sf::Keyboard::Escape)
+                {
+                    std::cout << "Exiting vizualization" << std::endl;
+                    window.close();
+                }
+            }
+
         }
 
         window.clear();
+
+        window.draw(weights);
+
+        for(auto & shape : nodes)
+            window.draw(shape);
 
         window.display();
     }
 }
 
+
+/**
+ * This is a worker function that caluclates the distance between either nodes or
+ * layers of nodes.
+ * @param  max    Either the x or y size of the window.
+ * @param  num    Either the number of layers or nodes
+ *                in the network.
+ * @param  radius The radius of the node.
+ * @return        The distance between either nodes or layers.
+ */
+float NeuralNetwork::calcDistance(unsigned int max, unsigned int num, float radius)
+{
+    return (max - 2.f * num * radius) / (num + 1);
+}
 
 /**
  * This function updates a Gene within the Genome of the Neural Network and

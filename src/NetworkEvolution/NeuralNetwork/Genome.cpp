@@ -25,9 +25,10 @@ Genome::Genome(unsigned int nInput, unsigned int nOutput)
     input = nInput;
     output = nOutput;
     Gene _gene;
+
     for(unsigned int i = 0; i < nInput; ++i)
     {
-        for(unsigned int j = 0; j < nOutput; ++j)
+        for(unsigned int j = nInput; j < nOutput + nInput; ++j)
         {
             //Generate a random weight here, needs to be implamented in the future.
             _gene.weight = 1.0;

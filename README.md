@@ -5,6 +5,6 @@ This is an implamenation of a customized and more flexible C++ version of NEAT. 
 
 
 Sources and Resources used:
-* [NEAT](http://www.mitpressjournals.org/doi/abs/10.1162/106365602320169811)
+* [NEAT](http://www.mitpressjournals.org/doi/abs/10.1162/106365602320169811), [click here if you want the pdf](http://nn.cs.utexas.edu/downloads/papers/stanley.ec02.pdf)
 * [Backpropagation example](https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/)
 * [SFML](https://www.sfml-dev.org/)
