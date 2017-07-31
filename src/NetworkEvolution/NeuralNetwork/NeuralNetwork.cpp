@@ -463,11 +463,11 @@ std::vector<double> NeuralNetwork::getNetworkOutput()
  * it was not implamented this way in fear of data races and for convienence.
  * Does not work on OS X due to a limition of the OS and SFML.
  */
-void NeuralNetwork::visualize(unsigned int x, unsigned int y)
+void NeuralNetwork::visualize(unsigned int x, unsigned int y, unsigned int update)
 {
     isVisualized = true;
     std::cout << "Launching window: press escape to exit" << std::endl;
-    vThread = new std::thread(&NeuralNetwork::displayWindow,this,x,y);
+    vThread = new std::thread(&NeuralNetwork::displayWindow,this,x,y,update);
 
 }
 
@@ -648,11 +648,9 @@ void NeuralNetwork::lockFunc(std::atomic<unsigned int> & current, unsigned int t
  * This is the helper function that actually creates and displays the visualization
  * of This neural network.
  */
-void NeuralNetwork::displayWindow(unsigned int winX, unsigned int winY)
+void NeuralNetwork::displayWindow(unsigned int winX, unsigned int winY,unsigned int updateRate)
 {
     sf::RenderWindow window(sf::VideoMode(winX,winY),"Neural Network Visualization");
-
-    unsigned int updateRate = 5; // how many seconds at the frameRate to update network.
     unsigned int  frameRate = 60;
 
     unsigned int limit = updateRate * frameRate;
@@ -663,7 +661,8 @@ void NeuralNetwork::displayWindow(unsigned int winX, unsigned int winY)
     window.setFramerateLimit(frameRate);
 
     std::vector<sf::CircleShape> nodes;
-    sf::VertexArray weights(sf::LinesStrip);
+    std::vector<sf::CircleShape> biases;
+    std::vector<sf::Vertex> weights;
     sf::CircleShape _shape;
 
     while(window.isOpen())
@@ -677,18 +676,38 @@ void NeuralNetwork::displayWindow(unsigned int winX, unsigned int winY)
             weights.clear();
 
             float radius = 10;
+            float bXOffset = 100;
 
             _shape.setOrigin(radius,radius);
             _shape.setRadius(radius);
 
             unsigned int numLayers = dna -> getHidden().size() + 2;
 
-            xDistance = calcDistance(winX,numLayers,radius);
 
+            mLock.lock();
             unsigned int numInput = dna -> getInput();
             std::vector<unsigned int> topo = dna -> getHidden();
             unsigned int numOutput = dna -> getOutput();
+            unsigned int size = dna -> getGenomeSize();
 
+            std::vector<Bias> biasInformation = dna -> getBiasVector();
+            mLock.unlock();
+
+            unsigned int maxNum = numInput;
+            for(unsigned int i = 0; i < topo.size(); ++i)
+                if(topo[i] > maxNum)
+                    maxNum = topo[i];
+            if(numOutput > maxNum)
+                maxNum = numOutput;
+
+
+            float biasYDistance = calcDistance(winY,maxNum,radius) / 2.f;
+
+
+
+
+
+            xDistance = calcDistance(winX,numLayers,radius);
             yDistance = calcDistance(winY,numInput,radius);
             //Calculate the positions of the nodes.
             _shape.setPosition(xDistance, yDistance + radius);
@@ -731,17 +750,56 @@ void NeuralNetwork::displayWindow(unsigned int winX, unsigned int winY)
                 nodes.push_back(_shape);
             }
 
-            Gene _connection;
             sf::Vector2f pos;
-            //Add the lines.
-            for(unsigned int i = 0; i < dna -> getGenomeSize(); ++i)
+            //Biases
+            std::vector<unsigned int> usedLayers;
+            unsigned int _layer;
+            bool found;
+            for(auto & bias : biasInformation)
             {
-                _connection = dna -> getGene(i);
-                pos = nodes[_connection.inID].getPosition();
-                weights.append(sf::Vector2f(pos.x,pos.y));
-                pos = nodes[_connection.outID].getPosition();
-                weights.append(sf::Vector2f(pos.x,pos.y));
+
+                found = false;
+                mLock.lock();
+                _layer = findLayerFromNodeID(bias.node);
+                mLock.unlock();
+                for(auto layer : usedLayers)
+                    if(layer == _layer)
+                        found = true;
+
+                mLock.lock();
+                pos = nodes[bias.node].getPosition();
+                weights.push_back(pos);
+                pos = nodes[findIDWithNode(getLayer(_layer)[0])].getPosition();
+                pos.x += bXOffset;
+                pos.y = biasYDistance;
+                mLock.unlock();
+                weights.push_back(pos);
+
+
+                if(!found)
+                {
+                    usedLayers.push_back(_layer);
+                    _shape.setPosition(pos);
+                    biases.push_back(_shape);
+                }
             }
+
+
+            Gene _connection;
+
+            //Add the lines.
+            for(unsigned int i = 0; i < size; ++i)
+            {
+                mLock.lock();
+                _connection = dna -> getGene(i);
+                mLock.unlock();
+                pos = nodes[_connection.inID].getPosition();
+                weights.push_back(pos);
+                pos = nodes[_connection.outID].getPosition();
+                weights.push_back(pos);
+            }
+
+
 
 
         }
@@ -760,7 +818,7 @@ void NeuralNetwork::displayWindow(unsigned int winX, unsigned int winY)
             {
                 if (event.key.code == sf::Keyboard::Escape)
                 {
-                    std::cout << "Exiting vizualization" << std::endl;
+                    std::cout << "Exiting visualization" << std::endl;
                     window.close();
                 }
             }
@@ -769,7 +827,11 @@ void NeuralNetwork::displayWindow(unsigned int winX, unsigned int winY)
 
         window.clear();
 
-        window.draw(weights);
+
+        window.draw(&weights[0],weights.size(),sf::Lines);
+
+        for(auto & bias : biases)
+            window.draw(bias);
 
         for(auto & shape : nodes)
             window.draw(shape);

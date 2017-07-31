@@ -42,7 +42,7 @@ public:
     void loadFromFile(std::string);
     std::vector<double> getNetworkOutput();
 
-    void visualize(unsigned int, unsigned int);
+    void visualize(unsigned int, unsigned int, unsigned int=5);
 
 private:
     Node * findNodeWithID(unsigned int);
@@ -53,7 +53,7 @@ private:
     unsigned int findLayerFromNodeID(unsigned int);
 
     void lockFunc(std::atomic<unsigned int> &, unsigned int);
-    void displayWindow(unsigned int, unsigned int);
+    void displayWindow(unsigned int, unsigned int,unsigned int);
     float calcDistance(unsigned int, unsigned int, float);
     void updateGene(Node *, unsigned int &);
     void updateBias(Node *, unsigned int &);
