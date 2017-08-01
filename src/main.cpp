@@ -10,7 +10,6 @@ int main( int argc, char * argv[])
     //This is a test genome that I have wrote to a file for testing.
     //This is a test genome that I have wrote to a file for testing.
     Gene gene;
-    Bias bias;
 
 
     Genome code;
@@ -65,13 +64,6 @@ int main( int argc, char * argv[])
     gene.weight = 1;
     code.addGene(gene);
 
-    bias.bias = 1;
-    for(unsigned int i = 0; i < 9; ++i)
-    {
-
-        bias.node = i;
-        code.addBias(bias);
-    }
 
     code.saveGenome("../blueprints/TestGenome.charzar");
 
@@ -82,8 +74,8 @@ int main( int argc, char * argv[])
     std::vector<double> val {0.3,0.7};
     std::vector<double> out;
     testNetwork.setInputs(val);
-    val[0] = 0.01;
-    val[1] = 0.0006;
+    val[0] = 0.99;
+    val[1] = 1;
     testNetwork.visualize(900,600,1);
     testNetwork.setTraining(val);
     testNetwork.runForward();
@@ -95,14 +87,16 @@ int main( int argc, char * argv[])
     for(unsigned int i = 0; i < out.size(); ++i)
         std::cout << "out: " << out[i] << " target " << val[i] << std::endl;
 
-    /*
+
     for(unsigned int i = 0; i < 10000000; ++i)
     {
         testNetwork.gradientDecent(0.01);
         testNetwork.runForward();
     }
-    */
 
+
+    testNetwork.mutateAddBias(2);
+    testNetwork.runForward();
 
 
     out = testNetwork.getNetworkOutput();
@@ -110,5 +104,19 @@ int main( int argc, char * argv[])
     for(unsigned int i = 0; i < out.size(); ++i)
         std::cout << "out: " << out[i] << " target " << val[i] << std::endl;
     std::cout << "Total Error: " << testNetwork.getLMSError() << std::endl;
+
+
+    testNetwork.saveNetwork("../blueprints/testNetwork");
+
+    testNetwork.loadFromFile("../blueprints/testNetwork.charzar");
+    testNetwork.runForward();
+
+    out = testNetwork.getNetworkOutput();
+    std::cout << "\nAfter optimization\n" <<std::endl;
+    for(unsigned int i = 0; i < out.size(); ++i)
+        std::cout << "out: " << out[i] << " target " << val[i] << std::endl;
+    std::cout << "Total Error: " << testNetwork.getLMSError() << std::endl;
+
+
     return 0;
 }

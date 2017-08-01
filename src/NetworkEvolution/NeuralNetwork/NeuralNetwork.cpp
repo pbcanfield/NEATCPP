@@ -663,7 +663,12 @@ void NeuralNetwork::displayWindow(unsigned int winX, unsigned int winY,unsigned 
     std::vector<sf::CircleShape> nodes;
     std::vector<sf::CircleShape> biases;
     std::vector<sf::Vertex> weights;
+    std::vector<double> colorMultipliers;
     sf::CircleShape _shape;
+    sf::Color nodeColor;
+    nodeColor.g = 0;
+    nodeColor.b = 200;
+
 
     while(window.isOpen())
     {
@@ -674,6 +679,7 @@ void NeuralNetwork::displayWindow(unsigned int winX, unsigned int winY,unsigned 
             //Optimize this later.
             nodes.clear();
             weights.clear();
+            colorMultipliers.clear();
 
             float radius = 10;
             float bXOffset = 100;
@@ -689,8 +695,18 @@ void NeuralNetwork::displayWindow(unsigned int winX, unsigned int winY,unsigned 
             std::vector<unsigned int> topo = dna -> getHidden();
             unsigned int numOutput = dna -> getOutput();
             unsigned int size = dna -> getGenomeSize();
-
             std::vector<Bias> biasInformation = dna -> getBiasVector();
+
+            for(auto & node : inputs)
+                colorMultipliers.push_back(node -> value());
+
+            for(auto & vec : hiddenLayer)
+                for(auto & node : vec)
+                    colorMultipliers.push_back(node -> value());
+
+            for(auto & node : outputs)
+                colorMultipliers.push_back(node -> value());
+
             mLock.unlock();
 
             unsigned int maxNum = numInput;
@@ -704,26 +720,32 @@ void NeuralNetwork::displayWindow(unsigned int winX, unsigned int winY,unsigned 
             float biasYDistance = calcDistance(winY,maxNum,radius) / 2.f;
 
 
-
-
-
             xDistance = calcDistance(winX,numLayers,radius);
             yDistance = calcDistance(winY,numInput,radius);
             //Calculate the positions of the nodes.
             _shape.setPosition(xDistance, yDistance + radius);
+            nodeColor.r = 255 * colorMultipliers[0];
+            _shape.setFillColor(nodeColor);
             nodes.push_back(_shape);
+
 
             for(unsigned int i = 1; i < numInput; ++i)
             {
+                nodeColor.r = 255 * colorMultipliers[i];
+                _shape.setFillColor(nodeColor);
                 _shape.setPosition(xDistance, (i + 1) * yDistance + 2 * i * radius);
                 nodes.push_back(_shape);
             }
 
+            unsigned int count = numInput;
             for(unsigned int i = 0; i < topo.size(); ++i)
             {
                 for(unsigned int j = 0; j < topo[i]; ++j)
                 {
                     yDistance = calcDistance(winY,topo[i],radius);
+                    nodeColor.r = 255 * colorMultipliers[count];
+                    _shape.setFillColor(nodeColor);
+
                     if (j == 0) // Have to do it this way in case there are no hidden nodes.
                     {
                         _shape.setPosition(2 * xDistance + i * xDistance,
@@ -736,18 +758,26 @@ void NeuralNetwork::displayWindow(unsigned int winX, unsigned int winY,unsigned 
                                           (j + 1) * yDistance + 2 * j * radius);
                         nodes.push_back(_shape);
                     }
+                    ++count;
                 }
             }
 
             yDistance = calcDistance(winY,numOutput,radius);
 
+            nodeColor.r = 255 * colorMultipliers[count];
+            _shape.setFillColor(nodeColor);
             _shape.setPosition(xDistance * numLayers, yDistance + radius);
             nodes.push_back(_shape);
 
+            ++count;
+
             for(unsigned int i = 1; i < numOutput; ++i)
             {
+                nodeColor.r = 255 * colorMultipliers[count];;
+                _shape.setFillColor(nodeColor);
                 _shape.setPosition(xDistance * numLayers, (i + 1) * yDistance + 2 * i * radius);
                 nodes.push_back(_shape);
+                ++count;
             }
 
             sf::Vector2f pos;
