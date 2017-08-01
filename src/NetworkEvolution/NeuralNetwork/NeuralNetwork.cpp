@@ -782,6 +782,8 @@ void NeuralNetwork::displayWindow(unsigned int winX, unsigned int winY,unsigned 
 
             sf::Vector2f pos;
             //Biases
+            nodeColor.r = 255;
+            _shape.setFillColor(nodeColor);
             std::vector<unsigned int> usedLayers;
             unsigned int _layer;
             bool found;
