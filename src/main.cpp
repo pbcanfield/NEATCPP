@@ -12,7 +12,8 @@ int main( int argc, char * argv[])
     Gene gene;
 
 
-    Genome code;
+    Genome code(10,10);
+    /*
     std::vector<unsigned int> topo {3,2};
     code.setInput(2);
     code.setHidden(topo);
@@ -67,16 +68,17 @@ int main( int argc, char * argv[])
 
     code.saveGenome("../blueprints/TestGenome.charzar");
 
+    */
+    NeuralNetwork testNetwork(code);
 
-    NeuralNetwork testNetwork;
-    testNetwork.loadFromFile("../blueprints/TestGenome.charzar");
+    //testNetwork.loadFromFile("../blueprints/TestGenome.charzar");
+    std::vector<double> inputs{0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1};
+    std::vector<double> val {0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0};
 
-    std::vector<double> val {0.3,0.7};
     std::vector<double> out;
     testNetwork.setInputs(val);
-    val[0] = 0.99;
-    val[1] = 1;
-    testNetwork.visualize(900,600,1);
+
+    testNetwork.visualize(900,600);
     testNetwork.setTraining(val);
     testNetwork.runForward();
 
@@ -95,20 +97,21 @@ int main( int argc, char * argv[])
     }
 
 
-    testNetwork.mutateAddBias(2);
-    testNetwork.runForward();
 
 
     out = testNetwork.getNetworkOutput();
+
     std::cout << "\nAfter optimization\n" <<std::endl;
     for(unsigned int i = 0; i < out.size(); ++i)
         std::cout << "out: " << out[i] << " target " << val[i] << std::endl;
     std::cout << "Total Error: " << testNetwork.getLMSError() << std::endl;
 
-
+    /*
     testNetwork.saveNetwork("../blueprints/testNetwork");
 
     testNetwork.loadFromFile("../blueprints/testNetwork.charzar");
+
+
     testNetwork.runForward();
 
     out = testNetwork.getNetworkOutput();
@@ -116,7 +119,7 @@ int main( int argc, char * argv[])
     for(unsigned int i = 0; i < out.size(); ++i)
         std::cout << "out: " << out[i] << " target " << val[i] << std::endl;
     std::cout << "Total Error: " << testNetwork.getLMSError() << std::endl;
-
+    */
 
     return 0;
 }

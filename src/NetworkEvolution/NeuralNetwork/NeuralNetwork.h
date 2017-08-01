@@ -15,6 +15,7 @@
 #include <thread>
 #include <mutex>
 #include <atomic>
+#include <random>
 
 
 class NeuralNetwork
@@ -76,6 +77,12 @@ private:
     bool isVisualized = false;
     std::mutex mLock;
     std::atomic<unsigned int> completed;
+
+
+    //Random numbers.
+    std::random_device rd;
+    std::mt19937 gen;
+    std::uniform_real_distribution<double> dis{-10.0,10.0};
 };
 
 #endif

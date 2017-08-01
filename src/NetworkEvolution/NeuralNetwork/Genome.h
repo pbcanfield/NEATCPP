@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <random>
 #include "Gene.h"
 
 class Genome

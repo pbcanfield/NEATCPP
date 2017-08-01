@@ -26,12 +26,16 @@ Genome::Genome(unsigned int nInput, unsigned int nOutput)
     output = nOutput;
     Gene _gene;
 
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<double> dis(-10.0,10.0);
+
     for(unsigned int i = 0; i < nInput; ++i)
     {
         for(unsigned int j = nInput; j < nOutput + nInput; ++j)
         {
             //Generate a random weight here, needs to be implamented in the future.
-            _gene.weight = 1.0;
+            _gene.weight = dis(gen);
             _gene.inID = i;
             _gene.outID = j;
             _gene.generation = 0;
