@@ -266,15 +266,18 @@ void Genome::loadFromFile(std::string dir)
               biasInfo.push_back(bTemp);
           }
           Gene gTemp;
-          while(!cry.eof())
+          while(true)
           {
                cry.read((char*)&gTemp.inID,INT);
                cry.read((char*)&gTemp.outID,INT);
                cry.read((char*)&gTemp.weight,DOUBLE);
                cry.read((char*)&gTemp.generation,INT);
                geneticCode.push_back(gTemp);
+
+               if(cry.eof())
+                    break;
+
           }
-          geneticCode.pop_back(); // this is a work around and needs to be fixed
           cry.close();
      }
      else
