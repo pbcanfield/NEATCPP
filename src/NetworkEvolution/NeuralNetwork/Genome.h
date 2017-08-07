@@ -17,18 +17,19 @@ public:
 	Genome();
 	Genome(unsigned int, unsigned int);
 	Genome(std::string);
-	void addGene(Gene);
-    void addBias(Bias);
-	void setInput(unsigned int);
-	void setHidden(std::vector<unsigned int>);
-	void setOutput(unsigned int);
-	void updateConnectionStructure(unsigned int);
-	void removeConnection(unsigned int, unsigned int);
 
-	void addInput();
-	void addHidden(unsigned int);
-	void insertHidden(unsigned int);
-	void addOutput();
+    void cross(Genome &);
+
+    void addGene(Gene);
+    void addBias(Bias);
+	void setInput(std::vector<unsigned int>);
+	void setHidden(std::vector<std::vector<unsigned int>>);
+	void setOutput(std::vector<unsigned int>);
+
+	void addInput(unsigned int);
+	void addHidden(unsigned int,unsigned int);
+	void insertHidden(unsigned int,unsigned int);
+	void addOutput(unsigned int);
 
 	void saveGenome(std::string);
 	void loadFromFile(std::string);
@@ -37,22 +38,29 @@ public:
     std::vector<Gene> getGeneVector();
     std::vector<Bias> getBiasVector();
 	Gene & getGene(unsigned int);
+    Gene & getGene(unsigned int, unsigned int);
     Bias & getBias(unsigned int);
 	unsigned int getGenomeSize();
     unsigned int getBiasSize();
+    unsigned int & lastNode();
 
-	unsigned int getInput();
-	std::vector<unsigned int> getHidden();
-	unsigned int getOutput();
+	std::vector<unsigned int> getInput();
+	std::vector<std::vector<unsigned int>> getHidden();
+	std::vector<unsigned int> getOutput();
 
 private:
+    bool isSimilarGene(Gene,unsigned int);
+    bool isSimilarBias(Bias,unsigned int);
+
 	std::vector<Gene> geneticCode;
     std::vector<Bias> biasInfo;
-	unsigned int input;
-	std::vector<unsigned int> hiddenLayer;
-	unsigned int output;
+	std::vector<unsigned int> input;
+	std::vector<std::vector<unsigned int>> hiddenLayer;
+	std::vector<unsigned int> output;
 
+    unsigned int ln;
 	const unsigned int INT = sizeof(int);
 	const unsigned int DOUBLE = sizeof(double);
+    const unsigned int BOOL = sizeof(bool);
 };
 #endif

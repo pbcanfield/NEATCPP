@@ -15,6 +15,7 @@ struct Gene
 {
 	unsigned int inID, outID;
 	double weight;
+    bool enabled;
 	int generation;
 };
 

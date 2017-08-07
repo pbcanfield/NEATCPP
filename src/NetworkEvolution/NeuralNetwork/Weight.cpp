@@ -17,7 +17,7 @@ Weight::Weight()
 /**
  * This is the constructor that initializes the values of the fConnection, bConnection
  * and the fConnection and the weight value by using the constructor of the primitive
- * objects.
+ * data types.
  * @param forward  The first node it is connected to.
  * @param backward The second node it is connected to.
  * @param w        The value of this weight.

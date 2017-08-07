@@ -24,6 +24,9 @@ public:
     NeuralNetwork();
     NeuralNetwork(std::string);
     NeuralNetwork(Genome);
+
+    NeuralNetwork * operator+(NeuralNetwork &);
+
     ~NeuralNetwork();
 
     void updateStructure();
@@ -47,7 +50,6 @@ public:
 
 private:
     Node * findNodeWithID(unsigned int);
-    unsigned int findIDWithNode(Node *);
     void processForward(unsigned int,unsigned int);
     unsigned int findNumInLayer(unsigned int);
     std::vector<Node*> & getLayer(unsigned int);

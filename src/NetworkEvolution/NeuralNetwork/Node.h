@@ -16,7 +16,7 @@ class Node
 {
 public:
     // Constructor and Destructor
-    Node();
+    Node(unsigned int);
     Node(double);
     ~Node();
 
@@ -41,6 +41,7 @@ public:
     Weight * getBackWeight(unsigned int pos) { return bConnections[pos]; }
 
     unsigned int getBackWeightSize() { return bConnections.size(); }
+    unsigned int getID() { return ID; }
 
     double & value() { return val; }
     double & bias() { return b; }
@@ -60,6 +61,8 @@ private:
     // The value,bias and sum
     double val,delta;
     double b = 0;
+
+    unsigned int ID;
 
 
 

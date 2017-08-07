@@ -4,6 +4,7 @@
  */
 #include "Genome.h"
 #include <iostream>
+#include <cstddef>
 
 /**
  * This is the defualt constructor that doesnt do anything really but it is
@@ -22,9 +23,16 @@ Genome::Genome()
  */
 Genome::Genome(unsigned int nInput, unsigned int nOutput)
 {
-    input = nInput;
-    output = nOutput;
+
+    for(unsigned int i = 0; i < nInput; ++i)
+        input.push_back(i);
+
+    for(unsigned int i = nInput; i < nOutput + nInput; ++i)
+        output.push_back(i);
+
     Gene _gene;
+    _gene.generation = 0;
+    _gene.enabled = true;
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -38,10 +46,10 @@ Genome::Genome(unsigned int nInput, unsigned int nOutput)
             _gene.weight = dis(gen);
             _gene.inID = i;
             _gene.outID = j;
-            _gene.generation = 0;
             geneticCode.push_back(_gene);
         }
     }
+    ln = nOutput + nInput - 1;
 }
 
 
@@ -52,6 +60,24 @@ Genome::Genome(unsigned int nInput, unsigned int nOutput)
 Genome::Genome(std::string dir)
 {
      loadFromFile(dir);
+}
+
+
+/**
+ * This is resposible for crossing the genetic code of Nerural networks so
+ * high perfoming NeuralNetworks can be bread.
+ * @param code This is the code of the new network.
+ */
+void Genome::cross(Genome & code)
+{
+    std::vector<Gene> genes = code.getGeneVector();
+    std::vector<Bias> biases = code.getBiasVector();
+
+    unsigned int count = 0;
+    while(isSimilarGene(genes[count],count)) ++count;
+
+    count = 0;
+
 }
 
 
@@ -81,7 +107,7 @@ void Genome::addBias(Bias info)
  * This is the function that sets the number of input nodes in the Genome.
  * It takes an unsigned integer that is the number of input nodes.
  */
-void Genome::setInput(unsigned int in)
+void Genome::setInput(std::vector<unsigned int> in)
 {
      input = in;
 }
@@ -92,7 +118,7 @@ void Genome::setInput(unsigned int in)
  * It takes an std::vector of unsigned integers that are the number of nodes
  * in each layer of the hidden layer.
  */
-void Genome::setHidden(std::vector<unsigned int> hidden)
+void Genome::setHidden(std::vector<std::vector<unsigned int>> hidden)
 {
      hiddenLayer = hidden;
 }
@@ -102,67 +128,23 @@ void Genome::setHidden(std::vector<unsigned int> hidden)
  * This is the function that sets the number of output nodes in the Genome.
  * It takes an unsigned integer that is the number of output nodes.
  */
-void Genome::setOutput(unsigned int out)
+void Genome::setOutput(std::vector<unsigned int> out)
 {
      output = out;
 }
 
-/**
- * This function updates the values of the IDs for all genes and biases after
- * there is an insertion of a node by the mutateAddNode function in the
- * NeuralNetwork.
- */
-void Genome::updateConnectionStructure(unsigned int newNodeID)
-{
-    //This can probably be made way more efficient.
-    for(auto & gene : geneticCode)
-    {
-        if(gene.inID >= newNodeID)
-            ++gene.inID;
-        if(gene.outID >= newNodeID)
-            ++gene.outID;
-    }
-
-    for(auto & bias : biasInfo)
-    {
-        if (bias.node >= newNodeID)
-            ++bias.node;
-    }
-}
-
-
-/**
- * This is a function that removes a Gene from the gene vector in the Genome
- * based on the two node ID's it is connected to.
- */
-void Genome::removeConnection(unsigned int in ,unsigned int out)
-{
-    unsigned int size = geneticCode.size();
-    bool found = false;
-    for(unsigned int i = 0; i < size && !found; ++i)
-    {
-        if(geneticCode[i].inID == in && geneticCode[i].outID == out)
-        {
-            found = true;
-            geneticCode.erase(geneticCode.begin() + i);
-        }
-    }
-}
-
 
 //This is function that incraments the neumber of input nodes in the genome.
-void Genome::addInput()
+void Genome::addInput(unsigned int ID)
 {
-     ++input;
+    input.push_back(ID);
 }
 
 
 //This is a function that incraments a specific layer of the hiddenLayer.
-void Genome::addHidden(unsigned int pos)
+void Genome::addHidden(unsigned int pos,unsigned int ID)
 {
-     ++hiddenLayer[pos];
-
-
+    hiddenLayer[pos].push_back(ID);
 }
 
 /**
@@ -170,17 +152,19 @@ void Genome::addHidden(unsigned int pos)
  * an unsigned int that is the layer that the new layer is to be insterted at
  * and adds one node to that location in a new layer.
  */
-void Genome::insertHidden(unsigned int layer)
+void Genome::insertHidden(unsigned int layer,unsigned int ID)
 {
-    hiddenLayer.insert(hiddenLayer.begin() + layer,1);
+    std::vector<unsigned int> _vec {ID};
+    hiddenLayer.insert(hiddenLayer.begin() + layer, _vec);
 }
 
 
 //This is function that incraments the neumber of output nodes in the genome.
-void Genome::addOutput()
+void Genome::addOutput(unsigned int ID)
 {
-     ++output;
+    output.push_back(ID);
 }
+
 
 /**
  * The saveGenome function takes a directory to a file as a string and saves it
@@ -192,40 +176,67 @@ void Genome::addOutput()
  */
 void Genome::saveGenome(std::string dir)
 {
-     std::ofstream charizard(dir, std::ios::binary);
+    std::ofstream charizard(dir, std::ios::binary);
 
+    /**
+     * writes the metadata to the file
+     * The first int that is written is the size of the input layer.
+     * The second int that is the number of layers in the hidden layer.
+     * The next int is the number of nodes in the corrisponding layer.
+     * The same pattern is followed for each layer.
+     * The last int is the size of the output layer and each proceeding
+     * int is the ID of each node.
+     * The Next thing (INT) that is written is the number of bias nodes.
+     * Then all the Biases are written to the file (BIAS).
+     * The last node is then wrttien to the file (INT).
+     * Then everything left in the file is the Gene connections between nodes.
+     */
 
-     //writes the metadata to the file
-     //the first int that is written is the size of the hidden layer
-     //the second int that is writtien is the number of biases
-     //then the input, the hiddenLayer, and the outputlayer is written
+    unsigned int castingVar = input.size();
+    charizard.write((char*)&castingVar,INT);
+    for(auto & ID : input)
+        charizard.write((char*)&ID,INT);
 
-     unsigned int castingVar = hiddenLayer.size();
-     charizard.write((char*)&castingVar,INT);
-     castingVar = biasInfo.size();
-     charizard.write((char*)&castingVar,INT);
+    castingVar = hiddenLayer.size();
+    charizard.write((char*)&castingVar,INT);
 
-     charizard.write((char*)&input,INT);
-     for(auto & layer: hiddenLayer)
-          charizard.write((char*)&layer,INT);
-     charizard.write((char*)&output,INT);
+    for(auto & vec : hiddenLayer)
+    {
+        castingVar = vec.size();
+        charizard.write((char*)&castingVar,INT);
 
-     for(auto & bias : biasInfo)
-     {
-         charizard.write((char*)&bias.bias,DOUBLE);
-         charizard.write((char*)&bias.node,INT);
-         charizard.write((char*)&bias.generation,INT);
-     }
+        for(auto & ID : vec)
+            charizard.write((char*)&ID,INT);
+    }
 
-     for(auto & gene: geneticCode)
-     {
-          charizard.write((char*)&gene.inID,INT);
-          charizard.write((char*)&gene.outID,INT);
-          charizard.write((char*)&gene.weight,DOUBLE);
-          charizard.write((char*)&gene.generation,INT);
-     }
+    castingVar = output.size();
+    charizard.write((char*)&castingVar,INT);
+    for(auto & ID : output)
+        charizard.write((char*)&ID,INT);
 
-     charizard.close();
+    castingVar = biasInfo.size();
+    charizard.write((char*)&castingVar,INT);
+
+    //Write ln.
+    charizard.write((char*)&ln,INT);
+
+    for(auto & bias : biasInfo)
+    {
+        charizard.write((char*)&bias.bias,DOUBLE);
+        charizard.write((char*)&bias.node,INT);
+        charizard.write((char*)&bias.generation,INT);
+    }
+
+    for(auto & gene: geneticCode)
+    {
+        charizard.write((char*)&gene.inID,INT);
+        charizard.write((char*)&gene.outID,INT);
+        charizard.write((char*)&gene.weight,DOUBLE);
+        charizard.write((char*)&gene.enabled,BOOL);
+        charizard.write((char*)&gene.generation,INT);
+    }
+
+    charizard.close();
 }
 
 
@@ -236,58 +247,79 @@ void Genome::saveGenome(std::string dir)
  */
 void Genome::loadFromFile(std::string dir)
 {
-     hiddenLayer.clear();
-     geneticCode.clear();
-     biasInfo.clear();
-     std::ifstream cry(dir, std::ios::binary);
+    input.clear();
+    for(auto & vec : hiddenLayer)
+        vec.clear();
+    output.clear();
+    hiddenLayer.clear();
 
-     if(cry.is_open())
-     {
-          unsigned int networkSize = 0;
-          unsigned int totalSize,biasSize;
-          cry.read((char*)&totalSize,INT);
-          cry.read((char*)&biasSize,INT);
-          cry.read((char*)&input,INT);
-          networkSize += input;
+    geneticCode.clear();
+    biasInfo.clear();
 
-          unsigned int layer;
-          for(unsigned int i = 0; i < totalSize; ++i)
-          {
-               cry.read((char*)&layer,INT);
-               hiddenLayer.push_back(layer);
-               networkSize += layer;
-          }
+    std::ifstream cry(dir, std::ios::binary);
 
-          cry.read((char*)&output,INT);
-          networkSize += output;
+    if(cry.is_open())
+    {
+        unsigned int hSize,size;
+        cry.read((char*)&size,INT);
 
-          Bias bTemp;
-          for(unsigned int i = 0 ; i < biasSize; ++i)
-          {
-              cry.read((char*)&bTemp.bias,DOUBLE);
-              cry.read((char*)&bTemp.node,INT);
-              cry.read((char*)&bTemp.generation,INT);
-              biasInfo.push_back(bTemp);
-          }
-          Gene gTemp;
-          while(true)
-          {
-               cry.read((char*)&gTemp.inID,INT);
-               cry.read((char*)&gTemp.outID,INT);
-               cry.read((char*)&gTemp.weight,DOUBLE);
-               cry.read((char*)&gTemp.generation,INT);
-               geneticCode.push_back(gTemp);
+        unsigned int _ID;
+        for(unsigned int i = 0; i < size; ++i)
+        {
+            cry.read((char*)&_ID,INT);
+            input.push_back(_ID);
+        }
 
-               if(cry.eof())
-                    break;
+        cry.read((char*)&size,INT);
+        std::vector<unsigned int> _vec;
+        for(unsigned int i = 0; i < size; ++i)
+        {
+            cry.read((char*)&hSize,INT);
+            hiddenLayer.push_back(_vec);
+            for(unsigned int j = 0; j < hSize; ++j)
+            {
+                cry.read((char*)&_ID,INT);
+                hiddenLayer[i].push_back(_ID);
 
-          }
-          cry.close();
-     }
-     else
-     {
-          std::cout << "Could not open file \"" << dir << '\"' << std::endl;
-     }
+            }
+        }
+
+        cry.read((char*)&size,INT);
+        for(unsigned int i = 0; i < size; ++i)
+        {
+            cry.read((char*)&_ID,INT);
+            output.push_back(_ID);
+        }
+
+        cry.read((char*)&ln,INT);
+        cry.read((char*)&size,INT);
+
+        Bias bTemp;
+        for(unsigned int i = 0 ; i < size; ++i)
+        {
+            cry.read((char*)&bTemp.bias,DOUBLE);
+            cry.read((char*)&bTemp.node,INT);
+            cry.read((char*)&bTemp.generation,INT);
+            biasInfo.push_back(bTemp);
+        }
+        Gene gTemp;
+        while(true)
+        {
+            cry.read((char*)&gTemp.inID,INT);
+            cry.read((char*)&gTemp.outID,INT);
+            cry.read((char*)&gTemp.weight,DOUBLE);
+            cry.read((char*)&gTemp.enabled,BOOL);
+            cry.read((char*)&gTemp.generation,INT);
+            geneticCode.push_back(gTemp);
+
+            if(cry.eof())
+                break;
+
+        }
+        cry.close();
+    }
+    else
+        std::cout << "Could not open file \"" << dir << '\"' << std::endl;
 }
 
 
@@ -326,6 +358,28 @@ Gene & Genome::getGene(unsigned int pos)
 }
 
 
+/**
+ * Gets a gene between two node ID's
+ * @param  in  [description]
+ * @param  out [description]
+ * @return     [description]
+ */
+Gene & Genome::getGene(unsigned int in, unsigned int out)
+{
+    unsigned int pos = 0;
+    unsigned int size = geneticCode.size();
+    bool found = false;
+    for(unsigned int i = 0; i < size && !found; ++i)
+    {
+        if(geneticCode[i].inID == in && geneticCode[i].outID == out)
+        {
+            pos = i;
+            found = true;
+        }
+    }
+    return geneticCode[pos];
+}
+
 //This returns a reference to a Bias at a position.
 Bias & Genome::getBias(unsigned int pos)
 {
@@ -347,22 +401,59 @@ unsigned int Genome::getBiasSize()
 }
 
 
+//Returns the last node number that was created.
+unsigned int & Genome::lastNode()
+{
+    return ln;
+}
+
 //This returns the number of input nodes.
-unsigned int Genome::getInput()
+std::vector<unsigned int> Genome::getInput()
 {
      return input;
 }
 
 
 //This returns the vector that stores the hiddenLayer topology.
-std::vector<unsigned int> Genome::getHidden()
+std::vector<std::vector<unsigned int>> Genome::getHidden()
 {
      return hiddenLayer;
 }
 
 
 //This returns the number of output nodes.
-unsigned int Genome::getOutput()
+std::vector<unsigned int> Genome::getOutput()
 {
      return output;
+}
+
+
+/**
+ * Checks if a Gene is the same as as Gene at a position in the
+ * Gene vector.
+ * @param  Gene This is the Gene being compared.
+ * @param  int  This is the position that the Gene is at in the
+ *              Gene vector.
+ * @return      Returns true if the Gene is the same and false if
+ *              it isnt.
+ */
+bool Genome::isSimilarGene(Gene connect,unsigned int pos)
+{
+    return connect.inID == geneticCode[pos].inID &&
+           connect.outID == geneticCode[pos].outID;
+}
+
+
+/**
+ * Checks if a Bias is the same as a Bias in the Bias
+ * vector.
+ * @param  bias This is the Bias being compared.
+ * @param  pos  This is the position that the Bias is at in the
+ *              Bias vector.
+ * @return      Returns true if the Bias is the same and false if
+ *              it isnt.
+ */
+bool Genome::isSimilarBias(Bias bias,unsigned int pos)
+{
+    return bias.node == biasInfo[pos].node;
 }
