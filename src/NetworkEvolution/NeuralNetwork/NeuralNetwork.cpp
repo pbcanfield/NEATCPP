@@ -13,6 +13,7 @@ NeuralNetwork::NeuralNetwork()
 {
     generation = 0;
     dna = new Genome();
+    gen.seed(rd());
 }
 
 
@@ -25,6 +26,8 @@ NeuralNetwork::NeuralNetwork(std::string dir)
 {
     dna = new Genome();
     generation = 0;
+    gen.seed(rd());
+
 
     dna -> loadFromFile(dir);
     updateStructure();
@@ -40,10 +43,23 @@ NeuralNetwork::NeuralNetwork(Genome code)
 {
     dna = new Genome();
     generation = 0;
+    gen.seed(rd());
+
     dna -> copyIntoGenome(code);
     updateStructure();
 }
 
+
+/**
+ * This is the function that is resposible for crossing Neural Networks
+ * by crossing the genomes of the NeuralNetworks and returning a new
+ * network pointer.
+ */
+NeuralNetwork * NeuralNetwork::operator+(NeuralNetwork & one)
+{
+    NeuralNetwork * networkPtr;
+    return networkPtr;
+}
 
 /**
  * This destructor deallocates all the input, hidden and output
@@ -71,7 +87,6 @@ NeuralNetwork::~NeuralNetwork()
     for(auto & node : outputs)
         delete node;
 
-
 }
 
 
@@ -91,28 +106,27 @@ void NeuralNetwork::updateStructure()
     hiddenLayer.clear();
 
     outputs.clear();
+
     //Create the nodes in the network.
     //Create the input layer.
-    unsigned int size = dna -> getInput();
-    for(unsigned int i = 0; i < size; ++i)
-        inputs.push_back(new Node());
+    std::vector<unsigned int> _vec = dna -> getInput();
+    for(auto & node : _vec)
+        inputs.push_back(new Node(node));
 
     //Create the hidden layer.
-    std::vector<unsigned int> topo = dna -> getHidden();
-    size = topo.size();
+    std::vector<std::vector<unsigned int>> topo = dna -> getHidden();
+    unsigned int size = topo.size();
 
     hiddenLayer.resize(size);
 
     for(unsigned int i = 0; i < size; ++i)
-        for(unsigned int j = 0; j < topo[i]; ++j)
-            hiddenLayer[i].push_back(new Node());
-
+        for(unsigned int j = 0; j < topo[i].size(); ++j)
+            hiddenLayer[i].push_back(new Node(topo[i][j]));
 
     //Create the output layer.
-    size = dna -> getOutput();
-    for(unsigned int i = 0; i < size; ++i)
-        outputs.push_back(new Node());
-
+    _vec = dna -> getOutput();
+    for(auto & node : _vec)
+        outputs.push_back(new Node(node));
 
     //Connect structure based on the genes in the genome and add the correct weights.
     unsigned int numConnections = dna -> getGenomeSize();
@@ -120,8 +134,9 @@ void NeuralNetwork::updateStructure()
     for(unsigned int i = 0; i < numConnections; ++i)
     {
         currentGene = dna -> getGene(i);
-        addWeight(findNodeWithID(currentGene.inID),findNodeWithID(currentGene.outID),
-                                 currentGene.weight);
+        if(currentGene.enabled)
+            addWeight(findNodeWithID(currentGene.inID),findNodeWithID(currentGene.outID),
+                                     currentGene.weight);
     }
 
     //Could optimize this bit but I dont know if its worth the memory overhead
@@ -141,12 +156,13 @@ void NeuralNetwork::updateStructure()
 void NeuralNetwork::mutateAddWeight(unsigned int nodeOne, unsigned int nodeTwo)
 {
     //Change 1 to a random weight later.
+    double weight = dis(gen);
     Gene connection;
     connection.inID = nodeOne;
     connection.outID = nodeTwo;
-    connection.weight = 1;
+    connection.weight = weight;
     connection.generation = generation;
-    addWeight(findNodeWithID(nodeOne),findNodeWithID(nodeTwo),1);
+    addWeight(findNodeWithID(nodeOne),findNodeWithID(nodeTwo),weight);
     dna -> addGene(connection);
     ++generation;
 }
@@ -168,41 +184,40 @@ void NeuralNetwork::mutateAddNode(unsigned int nodeOne, unsigned int nodeTwo)
 
     unsigned int layer = findLayerFromNodeID(nodeOne);
     unsigned int layerDiff = findLayerFromNodeID(nodeTwo) - layer;
+    unsigned int nodeID = ++dna -> lastNode();
+
     if(layerDiff % 2 != 0)
     {
         std::vector<Node *> _layer;
         hiddenLayer.insert(hiddenLayer.begin() + layer,_layer);
-        dna -> insertHidden(layer);
+        dna -> insertHidden(layer,nodeID);
     }
     else
-        dna -> addHidden(layer);
+        dna -> addHidden(layer,nodeID);
 
     Node * first = findNodeWithID(nodeOne);
     Node * last = findNodeWithID(nodeTwo);
 
-    hiddenLayer[layer].push_back(new Node());
+    hiddenLayer[layer].push_back(new Node(nodeID));
     Node * middle = hiddenLayer[layer].back();
-    //Change 1.0 to a random number.
 
-    double w1 = 1.0, w2 = 1.0;
+    double w1 = dis(gen), w2 = dis(gen);
 
     addWeight(first, middle, w1);
     addWeight(middle, last, w2);
 
     Gene connection;
     connection.generation = generation;
-    unsigned int firstID = findIDWithNode(first);
-    unsigned int medID = findIDWithNode(middle);
-    unsigned int lastID = findIDWithNode(last);
+    unsigned int firstID = first -> getID();
+    unsigned int lastID = last -> getID();
 
-    dna -> updateConnectionStructure(medID);
-    dna -> removeConnection(firstID,lastID);
+    dna -> getGene(firstID,lastID).enabled = false;
 
     connection.inID = firstID;
-    connection.outID = medID;
+    connection.outID = nodeID;
     connection.weight = w1;
     dna -> addGene(connection);
-    connection.inID = medID;
+    connection.inID = nodeID;
     connection.outID = lastID;
     connection.weight = w2;
     dna -> addGene(connection);
@@ -219,7 +234,7 @@ void NeuralNetwork::mutateAddBias(unsigned int node)
 {
     Bias bias;
     //Again change 1 to a random number.
-    double rBias = 1.0;
+    double rBias = dis(gen);
     bias.node = node;
     bias.bias = rBias;
     bias.generation = generation;
@@ -405,26 +420,6 @@ void NeuralNetwork::saveNetwork(std::string name)
 {
     if(name.find(".charzar") == std::string::npos)
         name += ".charzar"; //maybe dont do it this way
-
-
-    //Update Genes and Biases in the Genome.
-    unsigned int gCount = 0, bCount = 0;
-    for(auto & node : inputs)
-    {
-        updateGene(node,gCount);
-        updateBias(node,bCount);
-    }
-    for(auto & vec : hiddenLayer)
-    {
-        for(auto & node : vec)
-        {
-            updateGene(node,gCount);
-            updateBias(node,bCount);
-        }
-    }
-    for(auto & node : outputs)
-        updateBias(node,bCount);
-
     dna -> saveGenome(name);
 }
 
@@ -463,10 +458,12 @@ std::vector<double> NeuralNetwork::getNetworkOutput()
  * it was not implamented this way in fear of data races and for convienence.
  * Does not work on OS X due to a limition of the OS and SFML.
  */
-void NeuralNetwork::visualize(unsigned int x, unsigned int y)
+void NeuralNetwork::visualize(unsigned int x, unsigned int y, unsigned int update)
 {
     isVisualized = true;
-    vThread = new std::thread(&NeuralNetwork::displayWindow,this,*dna,x,y);
+    std::cout << "Launching window: press escape to exit" << std::endl;
+    vThread = new std::thread(&NeuralNetwork::displayWindow,this,x,y,update);
+
 }
 
 
@@ -478,79 +475,51 @@ void NeuralNetwork::visualize(unsigned int x, unsigned int y)
  */
 Node * NeuralNetwork::findNodeWithID(unsigned int ID)
 {
-    //calculates the size of the hiddenLayer.
-    unsigned int hiddenLayerSize = 0;
-    for(auto & vec : hiddenLayer)
-        hiddenLayerSize += vec.size();
+    Node * nodePtr = NULL;
+    Node * _ptr;
 
-    if(ID < inputs.size())
-    {
-        return inputs[ID];
-    }
-    else if (ID < inputs.size() + hiddenLayerSize)
-    {
-        ID -= inputs.size();
-        unsigned int count = 0;
-
-        for(auto & vec : hiddenLayer)
-        {
-            for(auto & node : vec)
-            {
-                if(count == ID)
-                    return node;
-                ++count;
-            }
-        }
-    }
-
-    ID -= inputs.size() + hiddenLayerSize;
-    return outputs[ID];
-}
-
-
-/**
- * This takes a Node * and returns the current node ID based on its placement in
- * the network. It could probably be optimized which would leed to much better
- * speed.
- */
-unsigned int NeuralNetwork::findIDWithNode(Node * target)
-{
-    bool found = false;
-    unsigned int ID;
+    //Search the input layer.
     unsigned int size = inputs.size();
-    unsigned int count = size;
+    bool found = false;
 
     for(unsigned int i = 0; i < size && !found; ++i)
     {
-        if (inputs[i] == target)
+        _ptr = inputs[i];
+        if(_ptr -> getID() == ID)
         {
+            nodePtr = _ptr;
             found = true;
-            ID = i;
         }
     }
+
+    //Search the hidden layer.
     size = hiddenLayer.size();
     for(unsigned int i = 0; i < size && !found; ++i)
     {
         for(unsigned int j = 0; j < hiddenLayer[i].size() && !found; ++j)
         {
-            if(hiddenLayer[i][j] == target)
+            _ptr = hiddenLayer[i][j];
+            if(_ptr -> getID() == ID)
             {
+                nodePtr = _ptr;
                 found = true;
-                ID = count;
             }
-            ++count;
         }
     }
+
+    //Search the output layer.
+
     size = outputs.size();
     for(unsigned int i = 0; i < size && !found; ++i)
     {
-        if(outputs[i] == target)
+        _ptr = outputs[i];
+        if(_ptr -> getID() == ID)
         {
+            nodePtr = _ptr;
             found = true;
-            ID = count;
         }
     }
-    return ID;
+    return nodePtr;
 }
 
 
@@ -644,29 +613,256 @@ void NeuralNetwork::lockFunc(std::atomic<unsigned int> & current, unsigned int t
 
 /**
  * This is the helper function that actually creates and displays the visualization
- * of This neural network. This is not done yet as I couldnt program it on OS X
- * do to a OS limition.
+ * of This neural network.
  */
-void NeuralNetwork::displayWindow(Genome code, unsigned int winX, unsigned int winY)
+void NeuralNetwork::displayWindow(unsigned int winX, unsigned int winY,unsigned int updateRate)
 {
     sf::RenderWindow window(sf::VideoMode(winX,winY),"Neural Network Visualization");
+    unsigned int  frameRate = 60;
+
+    unsigned int limit = updateRate * frameRate;
+    unsigned int count = 0;
+
+    float xDistance,yDistance;
+
+    window.setFramerateLimit(frameRate);
+
+    std::vector<sf::CircleShape> nodes;
+    std::vector<sf::CircleShape> biases;
+    std::vector<sf::Vertex> weights;
+    std::vector<double> colorMultipliers;
+    sf::CircleShape _shape;
+    sf::Color nodeColor;
+    nodeColor.g = 0;
+    nodeColor.b = 200;
 
 
     while(window.isOpen())
     {
+
+        if(count == 0)
+        {
+            //update the visualization
+            //Optimize this later.
+            nodes.clear();
+            weights.clear();
+            colorMultipliers.clear();
+
+            float radius = 10;
+            float bXOffset = 100;
+
+            _shape.setOrigin(radius,radius);
+            _shape.setRadius(radius);
+
+            unsigned int numLayers = dna -> getHidden().size() + 2;
+
+
+            mLock.lock();
+            unsigned int numInput = dna -> getInput().size();
+
+
+            std::vector<unsigned int> topo;
+
+            {
+            std::vector<std::vector<unsigned int>> _topo = dna -> getHidden();
+            for(unsigned int i = 0; i < _topo.size(); ++i)
+                topo.push_back(_topo[i].size());
+
+            }
+
+            unsigned int numOutput = dna -> getOutput().size();
+            unsigned int size = dna -> getGenomeSize();
+            std::vector<Bias> biasInformation = dna -> getBiasVector();
+
+            for(auto & node : inputs)
+                colorMultipliers.push_back(node -> value());
+
+            for(auto & vec : hiddenLayer)
+                for(auto & node : vec)
+                    colorMultipliers.push_back(node -> value());
+
+            for(auto & node : outputs)
+                colorMultipliers.push_back(node -> value());
+
+            mLock.unlock();
+
+            unsigned int maxNum = numInput;
+            for(unsigned int i = 0; i < topo.size(); ++i)
+                if(topo[i] > maxNum)
+                    maxNum = topo[i];
+            if(numOutput > maxNum)
+                maxNum = numOutput;
+
+
+            float biasYDistance = calcDistance(winY,maxNum,radius) / 2.f;
+
+
+            xDistance = calcDistance(winX,numLayers,radius);
+            yDistance = calcDistance(winY,numInput,radius);
+            //Calculate the positions of the nodes.
+            _shape.setPosition(xDistance, yDistance + radius);
+            nodeColor.r = 255 * colorMultipliers[0];
+            _shape.setFillColor(nodeColor);
+            nodes.push_back(_shape);
+
+
+            for(unsigned int i = 1; i < numInput; ++i)
+            {
+                nodeColor.r = 255 * colorMultipliers[i];
+                _shape.setFillColor(nodeColor);
+                _shape.setPosition(xDistance, (i + 1) * yDistance + 2 * i * radius);
+                nodes.push_back(_shape);
+            }
+
+            unsigned int count = numInput;
+            for(unsigned int i = 0; i < topo.size(); ++i)
+            {
+                for(unsigned int j = 0; j < topo[i]; ++j)
+                {
+                    yDistance = calcDistance(winY,topo[i],radius);
+                    nodeColor.r = 255 * colorMultipliers[count];
+                    _shape.setFillColor(nodeColor);
+
+                    if (j == 0) // Have to do it this way in case there are no hidden nodes.
+                    {
+                        _shape.setPosition(2 * xDistance + i * xDistance,
+                                           yDistance + radius);
+                        nodes.push_back(_shape);
+                    }
+                    else
+                    {
+                        _shape.setPosition(2 * xDistance + i * xDistance,
+                                          (j + 1) * yDistance + 2 * j * radius);
+                        nodes.push_back(_shape);
+                    }
+                    ++count;
+                }
+            }
+
+            yDistance = calcDistance(winY,numOutput,radius);
+
+            nodeColor.r = 255 * colorMultipliers[count];
+            _shape.setFillColor(nodeColor);
+            _shape.setPosition(xDistance * numLayers, yDistance + radius);
+            nodes.push_back(_shape);
+
+            ++count;
+
+            for(unsigned int i = 1; i < numOutput; ++i)
+            {
+                nodeColor.r = 255 * colorMultipliers[count];;
+                _shape.setFillColor(nodeColor);
+                _shape.setPosition(xDistance * numLayers, (i + 1) * yDistance + 2 * i * radius);
+                nodes.push_back(_shape);
+                ++count;
+            }
+
+            sf::Vector2f pos;
+            //Biases
+            nodeColor.r = 255;
+            _shape.setFillColor(nodeColor);
+            std::vector<unsigned int> usedLayers;
+            unsigned int _layer;
+            bool found;
+            for(auto & bias : biasInformation)
+            {
+
+                found = false;
+                mLock.lock();
+                _layer = findLayerFromNodeID(bias.node);
+                mLock.unlock();
+                for(auto layer : usedLayers)
+                    if(layer == _layer)
+                        found = true;
+
+                mLock.lock();
+                pos = nodes[bias.node].getPosition();
+                weights.push_back(pos);
+                pos = nodes[getLayer(_layer)[0] -> getID()].getPosition();
+                pos.x += bXOffset;
+                pos.y = biasYDistance;
+                mLock.unlock();
+                weights.push_back(pos);
+
+
+                if(!found)
+                {
+                    usedLayers.push_back(_layer);
+                    _shape.setPosition(pos);
+                    biases.push_back(_shape);
+                }
+            }
+
+
+            Gene _connection;
+
+            //Add the lines.
+            for(unsigned int i = 0; i < size; ++i)
+            {
+                mLock.lock();
+                _connection = dna -> getGene(i);
+                mLock.unlock();
+                pos = nodes[_connection.inID].getPosition();
+                weights.push_back(pos);
+                pos = nodes[_connection.outID].getPosition();
+                weights.push_back(pos);
+            }
+
+
+
+
+        }
+        if (count < limit)
+            ++count;
+        else
+            count = 0;
+
         sf::Event event;
         while(window.pollEvent(event))
         {
             if(event.type == sf::Event::Closed)
                 window.close();
+
+            if (event.type == sf::Event::KeyPressed)
+            {
+                if (event.key.code == sf::Keyboard::Escape)
+                {
+                    std::cout << "Exiting visualization" << std::endl;
+                    window.close();
+                }
+            }
+
         }
 
         window.clear();
+
+
+        window.draw(&weights[0],weights.size(),sf::Lines);
+
+        for(auto & bias : biases)
+            window.draw(bias);
+
+        for(auto & shape : nodes)
+            window.draw(shape);
 
         window.display();
     }
 }
 
+
+/**
+ * This is a worker function that caluclates the distance between either nodes or
+ * layers of nodes.
+ * @param  max    Either the x or y size of the window.
+ * @param  num    Either the number of layers or nodes
+ *                in the network.
+ * @param  radius The radius of the node.
+ * @return        The distance between either nodes or layers.
+ */
+float NeuralNetwork::calcDistance(unsigned int max, unsigned int num, float radius)
+{
+    return (max - 2.f * num * radius) / (num + 1);
+}
 
 /**
  * This function updates a Gene within the Genome of the Neural Network and
@@ -715,24 +911,42 @@ void NeuralNetwork::addWeight(Node * first, Node * last, double weight)
  */
 unsigned int NeuralNetwork::findLayerFromNodeID(unsigned int ID)
 {
-    unsigned int nInput = inputs.size();
-    unsigned int hSize = hiddenLayer.size();
+    unsigned int layer;
+    bool found = false;
+    unsigned int size = inputs.size();
 
-
-    if(ID < nInput)
+    for(unsigned int i = 0; i < size && !found; ++i)
     {
-        return 0;
-    }
-    else
-    {
-        unsigned int sum = nInput;
-        for(unsigned int i = 0; i < hSize; ++i)
+        if(inputs[i] -> getID() == ID)
         {
-            sum += hiddenLayer[i].size();
-            if(ID < sum)
-                return i + 1;
-
+            layer = 0;
+            found = true;
         }
     }
-    return hSize + 1;
+
+    size = hiddenLayer.size();
+    for(unsigned int i = 0; i < size; ++i)
+    {
+        for(unsigned int j = 0; j < hiddenLayer[i].size() && !found; ++j)
+        {
+            if(hiddenLayer[i][j] -> getID() == ID)
+            {
+                layer = i + 1;
+                found = true;
+            }
+        }
+    }
+
+    size = outputs.size();
+    for(unsigned int i = 0; i < size && !found; ++i)
+    {
+        if(outputs[i] -> getID() == ID)
+        {
+            layer = hiddenLayer.size() + 1;
+            found = true;
+        }
+    }
+
+    return layer;
+
 }

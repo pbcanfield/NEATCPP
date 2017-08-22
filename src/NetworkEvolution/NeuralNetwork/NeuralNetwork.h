@@ -15,6 +15,7 @@
 #include <thread>
 #include <mutex>
 #include <atomic>
+#include <random>
 
 
 class NeuralNetwork
@@ -23,6 +24,9 @@ public:
     NeuralNetwork();
     NeuralNetwork(std::string);
     NeuralNetwork(Genome);
+
+    NeuralNetwork * operator+(NeuralNetwork &);
+
     ~NeuralNetwork();
 
     void updateStructure();
@@ -42,19 +46,18 @@ public:
     void loadFromFile(std::string);
     std::vector<double> getNetworkOutput();
 
-    void visualize(unsigned int, unsigned int);
+    void visualize(unsigned int, unsigned int, unsigned int=5);
 
 private:
     Node * findNodeWithID(unsigned int);
-    unsigned int findIDWithNode(Node *);
     void processForward(unsigned int,unsigned int);
     unsigned int findNumInLayer(unsigned int);
     std::vector<Node*> & getLayer(unsigned int);
     unsigned int findLayerFromNodeID(unsigned int);
 
     void lockFunc(std::atomic<unsigned int> &, unsigned int);
-    void displayWindow(Genome,unsigned int, unsigned int);
-
+    void displayWindow(unsigned int, unsigned int,unsigned int);
+    float calcDistance(unsigned int, unsigned int, float);
     void updateGene(Node *, unsigned int &);
     void updateBias(Node *, unsigned int &);
 
@@ -76,6 +79,12 @@ private:
     bool isVisualized = false;
     std::mutex mLock;
     std::atomic<unsigned int> completed;
+
+
+    //Random numbers.
+    std::random_device rd;
+    std::mt19937 gen;
+    std::uniform_real_distribution<double> dis{-10.0,10.0};
 };
 
 #endif

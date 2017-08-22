@@ -5,10 +5,9 @@
 #include "Node.h"
 
 /** Constructs the node */
-Node::Node()
+Node::Node(unsigned int num)
 {
-
-
+    ID = num;
 }
 
 /**
