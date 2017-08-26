@@ -64,6 +64,8 @@ private:
     void addWeight(Node *, Node *, double);
 
 
+    double randomNumber();
+
     std::vector<Node*> inputs;
     std::vector<std::vector<Node*>> hiddenLayer;
     std::vector<Node*> outputs;
@@ -81,10 +83,6 @@ private:
     std::atomic<unsigned int> completed;
 
 
-    //Random numbers.
-    std::random_device rd;
-    std::mt19937 gen;
-    std::uniform_real_distribution<double> dis{-10.0,10.0};
 };
 
 #endif

@@ -28,6 +28,7 @@ private:
     void quicksortVector(std::vector<NeuralNetwork*>&, int, int);
     std::vector<std::vector<NeuralNetwork*>> networks;
 
+    unsigned int partition(std::vector<NeuralNetwork*>&, int, int);
 };
 
 #endif

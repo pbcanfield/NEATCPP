@@ -88,13 +88,13 @@ void NetworkManager::trainNetworksOnline(std::vector<std::vector<double>> inputD
 void NetworkManager::sortSupervisedNetworks()
 {
     for(auto & vec : networks)
-        quicksortVector(vec,0,vec.size());
+        quicksortVector(vec,0,vec.size() - 1);
 
 }
 
 void NetworkManager::crossTopHalf()
 {
-    
+
 }
 
 /**
@@ -103,35 +103,31 @@ void NetworkManager::crossTopHalf()
  * @param left  The starting position of the partition.
  * @param right The ending position of the partition.
  */
-void NetworkManager::quicksortVector(std::vector<NeuralNetwork*> & vec, int left, int right)
+void NetworkManager::quicksortVector(std::vector<NeuralNetwork*> & vec, int start, int end)
 {
-
-    int i(left);
-    int j(right);
-    NeuralNetwork * temp;
-    double pPoint = vec[(left + right) / 2] -> getLMSError();
-
-
-    while(i <= j)
+    if(start < end)
     {
-        while(vec[i] -> getLMSError() < pPoint)
-            ++i;
+        unsigned int pIndex = partition(vec, start, end );
+        quicksortVector(vec,start,pIndex - 1 );
+        quicksortVector(vec, pIndex + 1, end );
+    }
+}
 
-        while(vec[j] -> getLMSError() > pPoint)
-            --j;
+unsigned int NetworkManager::partition(std::vector<NeuralNetwork*> & vec, int start, int end)
+{
+    unsigned int pIn = start;
+    double pivot = vec[end] -> getLMSError();
 
-        if(i <= j)
+    for(int i = 0; i < end - 1; ++i)
+    {
+        if(vec[i] -> getLMSError() <= pivot)
         {
-            temp = vec[i];
-            vec[i] = vec[j];
-            vec[j] = temp;
-            ++i;
-            --j;
+            NeuralNetwork * temp = vec[i];
+            vec[i] = vec[pIn];
+            vec[pIn] = temp;
+            ++pIn;
         }
     }
 
-    if(left < j)
-        quicksortVector(vec, left, j);
-    if(i < right)
-        quicksortVector(vec, i, right);
+    return pIn;
 }

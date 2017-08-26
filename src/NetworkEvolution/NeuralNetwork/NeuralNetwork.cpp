@@ -13,7 +13,6 @@ NeuralNetwork::NeuralNetwork()
 {
     generation = 0;
     dna = new Genome();
-    gen.seed(rd());
 }
 
 
@@ -26,7 +25,6 @@ NeuralNetwork::NeuralNetwork(std::string dir)
 {
     dna = new Genome();
     generation = 0;
-    gen.seed(rd());
 
 
     dna -> loadFromFile(dir);
@@ -43,7 +41,6 @@ NeuralNetwork::NeuralNetwork(Genome code)
 {
     dna = new Genome();
     generation = 0;
-    gen.seed(rd());
 
     dna -> copyIntoGenome(code);
     updateStructure();
@@ -156,7 +153,7 @@ void NeuralNetwork::updateStructure()
 void NeuralNetwork::mutateAddWeight(unsigned int nodeOne, unsigned int nodeTwo)
 {
     //Change 1 to a random weight later.
-    double weight = dis(gen);
+    double weight = randomNumber();
     Gene connection;
     connection.inID = nodeOne;
     connection.outID = nodeTwo;
@@ -201,7 +198,7 @@ void NeuralNetwork::mutateAddNode(unsigned int nodeOne, unsigned int nodeTwo)
     hiddenLayer[layer].push_back(new Node(nodeID));
     Node * middle = hiddenLayer[layer].back();
 
-    double w1 = dis(gen), w2 = dis(gen);
+    double w1 = randomNumber(), w2 = randomNumber();
 
     addWeight(first, middle, w1);
     addWeight(middle, last, w2);
@@ -234,7 +231,7 @@ void NeuralNetwork::mutateAddBias(unsigned int node)
 {
     Bias bias;
     //Again change 1 to a random number.
-    double rBias = dis(gen);
+    double rBias = randomNumber();
     bias.node = node;
     bias.bias = rBias;
     bias.generation = generation;
@@ -949,4 +946,14 @@ unsigned int NeuralNetwork::findLayerFromNodeID(unsigned int ID)
 
     return layer;
 
+}
+
+
+double NeuralNetwork::randomNumber()
+{
+    double num = (double)(rand() % 10);
+    num += rand() / RAND_MAX;
+    if(rand() % 2 == 0)
+        num *= -1.0;
+    return num;
 }
