@@ -9,8 +9,9 @@
  * This is the defualt constructor that sets the generation to zero
  * and allocates the memory for the genome of this Neural Network.
  */
-NeuralNetwork::NeuralNetwork()
+NeuralNetwork::NeuralNetwork(unsigned int seed)
 {
+    srand(seed);
     generation = 0;
     dna = new Genome();
 }
@@ -21,8 +22,9 @@ NeuralNetwork::NeuralNetwork()
  * load the genome from a specified charzar file and updates structure
  * accordingly.
  */
-NeuralNetwork::NeuralNetwork(std::string dir)
+NeuralNetwork::NeuralNetwork(std::string dir, unsigned int seed)
 {
+    srand(seed);
     dna = new Genome();
     generation = 0;
 
@@ -37,8 +39,9 @@ NeuralNetwork::NeuralNetwork(std::string dir)
  * This is a constructor that takes a genome and copies that genome
  * into this networks genome and updates the structure accordingly.
  */
-NeuralNetwork::NeuralNetwork(Genome code)
+NeuralNetwork::NeuralNetwork(Genome code, unsigned int seed)
 {
+    srand(seed);
     dna = new Genome();
     generation = 0;
 
@@ -153,7 +156,7 @@ void NeuralNetwork::updateStructure()
 void NeuralNetwork::mutateAddWeight(unsigned int nodeOne, unsigned int nodeTwo)
 {
     //Change 1 to a random weight later.
-    double weight = randomNumber();
+    double weight = dna -> randomNumber();
     Gene connection;
     connection.inID = nodeOne;
     connection.outID = nodeTwo;
@@ -198,7 +201,7 @@ void NeuralNetwork::mutateAddNode(unsigned int nodeOne, unsigned int nodeTwo)
     hiddenLayer[layer].push_back(new Node(nodeID));
     Node * middle = hiddenLayer[layer].back();
 
-    double w1 = randomNumber(), w2 = randomNumber();
+    double w1 = dna -> randomNumber(), w2 = dna -> randomNumber();
 
     addWeight(first, middle, w1);
     addWeight(middle, last, w2);
@@ -231,7 +234,7 @@ void NeuralNetwork::mutateAddBias(unsigned int node)
 {
     Bias bias;
     //Again change 1 to a random number.
-    double rBias = randomNumber();
+    double rBias = dna -> randomNumber();
     bias.node = node;
     bias.bias = rBias;
     bias.generation = generation;
@@ -946,14 +949,4 @@ unsigned int NeuralNetwork::findLayerFromNodeID(unsigned int ID)
 
     return layer;
 
-}
-
-
-double NeuralNetwork::randomNumber()
-{
-    double num = (double)(rand() % 10);
-    num += rand() / RAND_MAX;
-    if(rand() % 2 == 0)
-        num *= -1.0;
-    return num;
 }

@@ -23,7 +23,6 @@ Genome::Genome()
  */
 Genome::Genome(unsigned int nInput, unsigned int nOutput)
 {
-
     for(unsigned int i = 0; i < nInput; ++i)
         input.push_back(i);
 
@@ -34,16 +33,12 @@ Genome::Genome(unsigned int nInput, unsigned int nOutput)
     _gene.generation = 0;
     _gene.enabled = true;
 
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<double> dis(-10.0,10.0);
 
     for(unsigned int i = 0; i < nInput; ++i)
     {
         for(unsigned int j = nInput; j < nOutput + nInput; ++j)
         {
-            //Generate a random weight here, needs to be implamented in the future.
-            _gene.weight = dis(gen);
+            _gene.weight = randomNumber();
             _gene.inID = i;
             _gene.outID = j;
             geneticCode.push_back(_gene);
@@ -456,4 +451,13 @@ bool Genome::isSimilarGene(Gene connect,unsigned int pos)
 bool Genome::isSimilarBias(Bias bias,unsigned int pos)
 {
     return bias.node == biasInfo[pos].node;
+}
+
+double Genome::randomNumber()
+{
+    double num = (double)(rand() % 10);
+    num += rand() / (double)RAND_MAX;
+    if(rand() % 2 == 0)
+        num *= -1.0;
+    return num;
 }

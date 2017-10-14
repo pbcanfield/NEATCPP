@@ -23,11 +23,12 @@ NetworkManager::NetworkManager()
 NetworkManager::NetworkManager(unsigned int populationSize, unsigned int input,
                                unsigned int output)
 {
-    Genome startingNetwork(input,output);
     std::vector<NeuralNetwork*> nets;
     for (unsigned int i = 0; i < populationSize; ++i)
-        nets.push_back(new NeuralNetwork(startingNetwork));
-
+    {
+        Genome startingNetwork(input,output);
+        nets.push_back(new NeuralNetwork(startingNetwork,rand()));
+    }
     networks.push_back(nets);
 }
 
@@ -103,31 +104,35 @@ void NetworkManager::crossTopHalf()
  * @param left  The starting position of the partition.
  * @param right The ending position of the partition.
  */
-void NetworkManager::quicksortVector(std::vector<NeuralNetwork*> & vec, int start, int end)
+void NetworkManager::quicksortVector(std::vector<NeuralNetwork*> & arr, int left, int right)
 {
-    if(start < end)
-    {
-        unsigned int pIndex = partition(vec, start, end );
-        quicksortVector(vec,start,pIndex - 1 );
-        quicksortVector(vec, pIndex + 1, end );
-    }
-}
+		int min = left + (right - left) / 2;
 
-unsigned int NetworkManager::partition(std::vector<NeuralNetwork*> & vec, int start, int end)
-{
-    unsigned int pIn = start;
-    double pivot = vec[end] -> getLMSError();
 
-    for(int i = 0; i < end - 1; ++i)
+    int i = left;
+    int j = right;
+    double pivot = arr[min] -> getLMSError();
+
+    while(left<j || i<right)
     {
-        if(vec[i] -> getLMSError() <= pivot)
-        {
-            NeuralNetwork * temp = vec[i];
-            vec[i] = vec[pIn];
-            vec[pIn] = temp;
-            ++pIn;
+        while(arr[i] -> getLMSError() <pivot)
+        i++;
+        while(arr[j] -> getLMSError() >pivot)
+        j--;
+
+        if(i<=j){
+            NeuralNetwork * temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
+            i++;
+            j--;
+        }
+        else{
+            if(left<j)
+                quicksortVector(arr, left, j);
+            if(i<right)
+                quicksortVector(arr,i,right);
+            return;
         }
     }
-
-    return pIn;
 }

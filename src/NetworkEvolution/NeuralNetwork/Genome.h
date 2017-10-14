@@ -48,6 +48,8 @@ public:
 	std::vector<std::vector<unsigned int>> getHidden();
 	std::vector<unsigned int> getOutput();
 
+    double randomNumber();
+
 private:
     bool isSimilarGene(Gene,unsigned int);
     bool isSimilarBias(Bias,unsigned int);

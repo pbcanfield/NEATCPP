@@ -21,9 +21,9 @@
 class NeuralNetwork
 {
 public:
-    NeuralNetwork();
-    NeuralNetwork(std::string);
-    NeuralNetwork(Genome);
+    NeuralNetwork(unsigned int);
+    NeuralNetwork(std::string,unsigned int);
+    NeuralNetwork(Genome,unsigned int);
 
     NeuralNetwork * operator+(NeuralNetwork &);
 
@@ -63,8 +63,6 @@ private:
 
     void addWeight(Node *, Node *, double);
 
-
-    double randomNumber();
 
     std::vector<Node*> inputs;
     std::vector<std::vector<Node*>> hiddenLayer;
