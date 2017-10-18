@@ -21,16 +21,17 @@
 class NeuralNetwork
 {
 public:
-    NeuralNetwork(unsigned int);
-    NeuralNetwork(std::string,unsigned int);
-    NeuralNetwork(Genome,unsigned int);
+    NeuralNetwork(unsigned int=rand());
+    NeuralNetwork(std::string,unsigned int=rand());
+    NeuralNetwork(Genome,unsigned int=rand());
 
     NeuralNetwork * operator+(NeuralNetwork &);
 
     ~NeuralNetwork();
 
     void updateStructure();
-    void mutateAddWeight(unsigned int, unsigned int);
+    void randomMutation(float,float,float);
+	void mutateAddWeight(unsigned int, unsigned int);
     void mutateAddNode(unsigned int, unsigned int);
     void mutateAddBias(unsigned int);
 

@@ -47,6 +47,8 @@ public:
 	std::vector<unsigned int> getInput();
 	std::vector<std::vector<unsigned int>> getHidden();
 	std::vector<unsigned int> getOutput();
+	
+	bool geneExist(unsigned int, unsigned int);
 
     double randomNumber();
 

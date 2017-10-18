@@ -57,8 +57,10 @@ NeuralNetwork::NeuralNetwork(Genome code, unsigned int seed)
  */
 NeuralNetwork * NeuralNetwork::operator+(NeuralNetwork & one)
 {
-    NeuralNetwork * networkPtr;
-    return networkPtr;
+	NeuralNetwork * networkPtr;
+	
+
+	return networkPtr;
 }
 
 /**
@@ -147,6 +149,28 @@ void NeuralNetwork::updateStructure()
 
 }
 
+void NeuralNetwork::randomMutation(float node, float bias, float connection) 
+{
+	float rnd = rand()/(float)RAND_MAX;
+	bias += node;
+	connection += bias;
+	
+	//Determine what the mutation is based on the probabilities given.
+	
+	if(rnd < node)
+	{
+		std::cout << "node mutation occured" << std::endl;
+	}
+	else if(rnd < bias)
+	{
+		std::cout << "bias mutation occured" << std::endl;
+	}
+	else if(rnd < connection)
+	{
+		std::cout << "connection mutation occured" << std::endl;
+	}
+}
+
 
 /**
  * The mutateAddWeight member function takes in two node ID's and creates a Weight
@@ -181,8 +205,8 @@ void NeuralNetwork::mutateAddWeight(unsigned int nodeOne, unsigned int nodeTwo)
  */
 void NeuralNetwork::mutateAddNode(unsigned int nodeOne, unsigned int nodeTwo)
 {
-
-    unsigned int layer = findLayerFromNodeID(nodeOne);
+	
+	unsigned int layer = findLayerFromNodeID(nodeOne);
     unsigned int layerDiff = findLayerFromNodeID(nodeTwo) - layer;
     unsigned int nodeID = ++dna -> lastNode();
 

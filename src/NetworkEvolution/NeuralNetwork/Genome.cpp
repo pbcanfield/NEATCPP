@@ -65,13 +65,6 @@ Genome::Genome(std::string dir)
  */
 void Genome::cross(Genome & code)
 {
-    std::vector<Gene> genes = code.getGeneVector();
-    std::vector<Bias> biases = code.getBiasVector();
-
-    unsigned int count = 0;
-    while(isSimilarGene(genes[count],count)) ++count;
-
-    count = 0;
 
 }
 
@@ -329,6 +322,7 @@ void Genome::copyIntoGenome(Genome & code)
     input = code.getInput();
     hiddenLayer = code.getHidden();
     output = code.getOutput();
+	ln = code.lastNode();
 }
 
 
@@ -423,6 +417,24 @@ std::vector<unsigned int> Genome::getOutput()
 }
 
 
+bool Genome::geneExist(unsigned int start, unsigned int end)
+{	
+	for(auto & gene : geneticCode)
+		if(gene.inID == start && gene.outID == end)
+			return true;
+	
+	return false;
+}
+
+double Genome::randomNumber()
+{
+    double num = (double)(rand() % 10);
+    num += rand() / (double)RAND_MAX;
+    if(rand() % 2 == 0)
+        num *= -1.0;
+    return num;
+}
+
 /**
  * Checks if a Gene is the same as as Gene at a position in the
  * Gene vector.
@@ -453,11 +465,3 @@ bool Genome::isSimilarBias(Bias bias,unsigned int pos)
     return bias.node == biasInfo[pos].node;
 }
 
-double Genome::randomNumber()
-{
-    double num = (double)(rand() % 10);
-    num += rand() / (double)RAND_MAX;
-    if(rand() % 2 == 0)
-        num *= -1.0;
-    return num;
-}

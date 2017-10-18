@@ -45,6 +45,26 @@ NetworkManager::~NetworkManager()
 }
 
 
+void NetworkManager::setNetworkInputs(std::vector<std::vector<double>> data)
+{
+	inputData = data;
+}
+
+
+void NetworkManager::setNetworkTraining(std::vector<std::vector<double>> data)
+{
+	trainingData = data;
+}
+
+void NetworkManager::setMutationProbability(float overall, float node,
+											float bias, float connection)
+{
+	mutationProb = overall;
+	nodeAddProb = node;
+	biasAddProb = bias;
+	connectionProb = connection;
+}
+
 /**
  * This is the function that sets the number of training iterations
  * will be run on a specific network.
@@ -52,9 +72,7 @@ NetworkManager::~NetworkManager()
  * @param vector The ourput data in the network.
  * @param int The number of times the network will train over the whole dataset.
  */
-void NetworkManager::trainNetworksOnline(std::vector<std::vector<double>> inputData,
-                                std::vector<std::vector<double>> trainingData,
-                                unsigned int epochs, double learningRate)
+void NetworkManager::trainNetworksOnline(unsigned int epochs, double learningRate)
 {
     if(trainingData.size() > 0 && inputData.size() > 0)
     {
@@ -98,6 +116,31 @@ void NetworkManager::crossTopHalf()
 
 }
 
+
+/**
+ * Simulates the entire population of NeuralNetworks over a number of generations.
+ * Based ona reinforcment learning process.
+ * @param numGenerations The number of generations that should be simulated.
+ */
+void NetworkManager::reinforcementSimulate(unsigned int numGenerations,unsigned int epochs, double lr)
+{
+	for(unsigned int i = 0; i < numGenerations; ++i)
+	{
+		for(auto & vec : networks)
+		{
+			for(auto & network : vec)
+			{
+				if(isMutation());
+						network -> randomMutation(nodeAddProb,biasAddProb,connectionProb);
+				
+				trainNetworksOnline(epochs,lr);
+				sortSupervisedNetworks();
+				//crossTopHalf();
+			}
+		}
+	}
+}
+
 /**
  * Applies the quicksort algorithm to the LMS performance of the networks.
  * @param vec   The current vector of NeuralNetwork pointers.
@@ -106,8 +149,7 @@ void NetworkManager::crossTopHalf()
  */
 void NetworkManager::quicksortVector(std::vector<NeuralNetwork*> & arr, int left, int right)
 {
-		int min = left + (right - left) / 2;
-
+	int min = left + (right - left) / 2;
 
     int i = left;
     int j = right;
@@ -135,4 +177,13 @@ void NetworkManager::quicksortVector(std::vector<NeuralNetwork*> & arr, int left
             return;
         }
     }
+}
+
+/**
+ * returns true or false in accordance to the Mutation probabilty that is
+ * used to determine the frequency of random mutations.
+ */
+bool NetworkManager::isMutation()
+{
+	return mutationProb <= rand()/(double)RAND_MAX;
 }
