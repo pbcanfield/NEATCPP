@@ -124,6 +124,7 @@ void NetworkManager::crossTopHalf()
  */
 void NetworkManager::reinforcementSimulate(unsigned int numGenerations,unsigned int epochs, double lr)
 {
+	networks[0][0] -> visualize(900,600,0.1);
 	for(unsigned int i = 0; i < numGenerations; ++i)
 	{
 		for(auto & vec : networks)
@@ -139,6 +140,7 @@ void NetworkManager::reinforcementSimulate(unsigned int numGenerations,unsigned 
 			}
 		}
 	}
+	std::cout << "Done Simmulating" << std::endl;
 }
 
 /**

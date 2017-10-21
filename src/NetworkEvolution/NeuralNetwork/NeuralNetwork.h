@@ -63,7 +63,8 @@ private:
     void updateBias(Node *, unsigned int &);
 
     void addWeight(Node *, Node *, double);
-
+	
+	unsigned int generateRandomNodeID(bool=true);
 
     std::vector<Node*> inputs;
     std::vector<std::vector<Node*>> hiddenLayer;
@@ -73,6 +74,7 @@ private:
     Genome * dna;
 
     unsigned int generation;
+	unsigned int lastGeneratedLayer;
 
     //multithreading
     std::vector<std::thread*> threads;

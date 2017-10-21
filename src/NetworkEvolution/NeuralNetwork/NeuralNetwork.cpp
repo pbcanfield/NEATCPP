@@ -159,15 +159,19 @@ void NeuralNetwork::randomMutation(float node, float bias, float connection)
 	
 	if(rnd < node)
 	{
-		std::cout << "node mutation occured" << std::endl;
+		unsigned int first = generateRandomNodeID();
+		unsigned int last = generateRandomNodeID(false);
+		mutateAddNode(first,last);
 	}
 	else if(rnd < bias)
 	{
-		std::cout << "bias mutation occured" << std::endl;
+		mutateAddBias(rand()  % (dna -> lastNode() + 1));
 	}
 	else if(rnd < connection)
 	{
-		std::cout << "connection mutation occured" << std::endl;
+		unsigned int first = generateRandomNodeID();
+		unsigned int last = generateRandomNodeID(false);
+		mutateAddWeight(first,last);
 	}
 }
 
@@ -973,4 +977,40 @@ unsigned int NeuralNetwork::findLayerFromNodeID(unsigned int ID)
 
     return layer;
 
+}
+
+
+/**
+ * Generates a random ID that has not yet been used in random number generation
+ * while also ensuring that this set of random numbers is always a valid pair
+ * for the mutateAddNode and mutateAddWeight functions.
+ *
+ * @param lastnode The last node ID that was generated
+ * @param isFirst  A defualt boolean value that specifies if this is the
+ *				   first or second number being generated.
+ */
+unsigned int NeuralNetwork::generateRandomNodeID(bool isFirst)
+{
+	unsigned int ID;
+
+	if(isFirst)
+	{
+		unsigned int testingLayer;
+		do
+		{
+			ID = rand() % (dna -> lastNode() + 1);
+			testingLayer = findLayerFromNodeID(ID);
+		} while(testingLayer == hiddenLayer.size() + 1);
+
+		lastGeneratedLayer = testingLayer;
+	}
+	else
+	{
+		do
+		{
+			ID = rand() % (dna -> lastNode() + 1);
+		} while(findLayerFromNodeID(ID) <= lastGeneratedLayer);
+	}
+	
+	return ID;
 }
