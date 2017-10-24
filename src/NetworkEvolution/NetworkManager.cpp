@@ -74,7 +74,7 @@ void NetworkManager::setMutationProbability(float overall, float node,
  */
 void NetworkManager::trainNetworksOnline(unsigned int epochs, double learningRate)
 {
-    if(trainingData.size() > 0 && inputData.size() > 0)
+	if(trainingData.size() > 0 && inputData.size() > 0)
     {
         unsigned int size = inputData.size();
         for(auto & vec : networks)
@@ -124,23 +124,22 @@ void NetworkManager::crossTopHalf()
  */
 void NetworkManager::reinforcementSimulate(unsigned int numGenerations,unsigned int epochs, double lr)
 {
-	networks[0][0] -> visualize(900,600,0.1);
 	for(unsigned int i = 0; i < numGenerations; ++i)
 	{
 		for(auto & vec : networks)
 		{
 			for(auto & network : vec)
 			{
+				network -> updateGeneration();
 				if(isMutation());
 						network -> randomMutation(nodeAddProb,biasAddProb,connectionProb);
-				
-				trainNetworksOnline(epochs,lr);
-				sortSupervisedNetworks();
-				//crossTopHalf();
 			}
 		}
+		trainNetworksOnline(epochs,lr);
+		sortSupervisedNetworks();
+		//crossTopHalf();
 	}
-	std::cout << "Done Simmulating" << std::endl;
+	std::cout << "Done Simulating" << std::endl;
 }
 
 /**

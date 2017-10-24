@@ -15,7 +15,6 @@
 #include <thread>
 #include <mutex>
 #include <atomic>
-#include <random>
 
 
 class NeuralNetwork
@@ -25,7 +24,7 @@ public:
     NeuralNetwork(std::string,unsigned int=rand());
     NeuralNetwork(Genome,unsigned int=rand());
 
-    NeuralNetwork * operator+(NeuralNetwork &);
+    NeuralNetwork * operator+(NeuralNetwork*);
 
     ~NeuralNetwork();
 
@@ -48,7 +47,9 @@ public:
     std::vector<double> getNetworkOutput();
 
     void visualize(unsigned int, unsigned int, unsigned int=5);
+	void updateGeneration();
 
+	Genome getGenome() {return *dna; }
 private:
     Node * findNodeWithID(unsigned int);
     void processForward(unsigned int,unsigned int);

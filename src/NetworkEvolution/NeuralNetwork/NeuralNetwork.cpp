@@ -55,11 +55,13 @@ NeuralNetwork::NeuralNetwork(Genome code, unsigned int seed)
  * by crossing the genomes of the NeuralNetworks and returning a new
  * network pointer.
  */
-NeuralNetwork * NeuralNetwork::operator+(NeuralNetwork & one)
+NeuralNetwork * NeuralNetwork::operator+(NeuralNetwork * two)
 {
 	NeuralNetwork * networkPtr;
 	
-
+	Genome child = dna -> cross(two -> getGenome());
+	networkPtr = new NeuralNetwork(child);
+	
 	return networkPtr;
 }
 
@@ -192,7 +194,6 @@ void NeuralNetwork::mutateAddWeight(unsigned int nodeOne, unsigned int nodeTwo)
     connection.generation = generation;
     addWeight(findNodeWithID(nodeOne),findNodeWithID(nodeTwo),weight);
     dna -> addGene(connection);
-    ++generation;
 }
 
 
@@ -249,7 +250,6 @@ void NeuralNetwork::mutateAddNode(unsigned int nodeOne, unsigned int nodeTwo)
     connection.outID = lastID;
     connection.weight = w2;
     dna -> addGene(connection);
-    ++generation;
 }
 
 
@@ -268,7 +268,6 @@ void NeuralNetwork::mutateAddBias(unsigned int node)
     bias.generation = generation;
     dna -> addBias(bias);
     findNodeWithID(node) -> bias() = rBias;
-    ++generation;
 }
 
 
@@ -494,6 +493,16 @@ void NeuralNetwork::visualize(unsigned int x, unsigned int y, unsigned int updat
 
 }
 
+/**
+ * This is the member function that is responsible for updating the generation
+ * Number in the NeuralNetwork. This function will be called by the NetworkManager
+ * after each generation.
+ */ 
+
+void NeuralNetwork::updateGeneration()
+{
+	++generation;
+}
 
 /**
  * This is a function that takes a linear identification number and searches

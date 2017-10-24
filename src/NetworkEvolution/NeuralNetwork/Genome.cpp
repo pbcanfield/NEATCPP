@@ -63,9 +63,46 @@ Genome::Genome(std::string dir)
  * high perfoming NeuralNetworks can be bread.
  * @param code This is the code of the new network.
  */
-void Genome::cross(Genome & code)
+Genome Genome::cross(Genome code)
 {
+	Genome resultant;
+	
+	std::vector<Gene> thisGeneCopy = geneticCode;
+	std::vector<Bias> thisBiasCopy = biasInfo;
+	
+	std::vector<Gene> otherGeneCopy = code.getGeneVector();
+	std::vector<Bias> otherBiasCopy = code.getBiasVector();
+	
 
+	for(auto & thisGene : thisGeneCopy)
+	{
+		for(auto & otherGene : otherGeneCopy)
+		{
+			if(thisGene.inID == otherGene.inID &&
+			   thisGene.outID == otherGene.outID &&
+			   thisGene.generation == otherGene.generation)
+			{
+				if(thisGene.enabled == otherGene.enabled)
+					resultant.addGene(thisGene);
+				else
+					resultant.addGene(thisGene.enabled == false ? thisGene:otherGene);
+				break;
+			}
+		}
+	}
+	
+	for(auto & thisBias : thisBiasCopy)
+	{
+		for(auto & otherBias : otherBiasCopy)
+		{
+			if(thisBias.node == otherBias.node &&
+			   thisBias.generation == otherBias.generation)
+				resultant.addBias(thisBias);
+			
+			break;
+		}
+	}
+	return resultant;
 }
 
 
@@ -434,34 +471,3 @@ double Genome::randomNumber()
         num *= -1.0;
     return num;
 }
-
-/**
- * Checks if a Gene is the same as as Gene at a position in the
- * Gene vector.
- * @param  Gene This is the Gene being compared.
- * @param  int  This is the position that the Gene is at in the
- *              Gene vector.
- * @return      Returns true if the Gene is the same and false if
- *              it isnt.
- */
-bool Genome::isSimilarGene(Gene connect,unsigned int pos)
-{
-    return connect.inID == geneticCode[pos].inID &&
-           connect.outID == geneticCode[pos].outID;
-}
-
-
-/**
- * Checks if a Bias is the same as a Bias in the Bias
- * vector.
- * @param  bias This is the Bias being compared.
- * @param  pos  This is the position that the Bias is at in the
- *              Bias vector.
- * @return      Returns true if the Bias is the same and false if
- *              it isnt.
- */
-bool Genome::isSimilarBias(Bias bias,unsigned int pos)
-{
-    return bias.node == biasInfo[pos].node;
-}
-
