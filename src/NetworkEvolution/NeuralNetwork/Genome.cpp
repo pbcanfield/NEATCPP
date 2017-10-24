@@ -72,8 +72,23 @@ Genome Genome::cross(Genome code)
 	
 	std::vector<Gene> otherGeneCopy = code.getGeneVector();
 	std::vector<Bias> otherBiasCopy = code.getBiasVector();
-	
 
+	if(ln > code.lastNode())
+	{
+		resultant.setInput(input);
+		resultant.setHidden(hiddenLayer);
+		resultant.setOutput(output);
+		resultant.lastNode() = ln;
+	}
+	else
+	{
+		resultant.setInput(code.getInput());
+		resultant.setHidden(code.getHidden());
+		resultant.setOutput(code.getOutput());
+		resultant.lastNode() = code.lastNode();
+	}
+	
+	//Add all identical Genes and biases to the resultant vector.
 	for(auto & thisGene : thisGeneCopy)
 	{
 		for(auto & otherGene : otherGeneCopy)
@@ -90,7 +105,6 @@ Genome Genome::cross(Genome code)
 			}
 		}
 	}
-	
 	for(auto & thisBias : thisBiasCopy)
 	{
 		for(auto & otherBias : otherBiasCopy)
@@ -102,6 +116,118 @@ Genome Genome::cross(Genome code)
 			break;
 		}
 	}
+	
+	//Remove the Genes taken out of consideration by the previous step from both copies.
+	std::vector<Gene> resultantGenes = resultant.getGeneVector();
+	std::vector<Bias> resultantBias = resultant.getBiasVector();
+	for(auto & removingGene : resultantGenes)
+	{
+		for(unsigned int i = 0; i < thisGeneCopy.size(); ++i)
+		{
+			if(removingGene.inID == thisGeneCopy[i].inID &&
+			   removingGene.outID == thisGeneCopy[i].outID &&
+			   removingGene.generation == thisGeneCopy[i].generation)
+			{
+				thisGeneCopy.erase(thisGeneCopy.begin() + i);
+			}
+		}
+		for(unsigned int i = 0; i < otherGeneCopy.size(); ++i)
+		{
+			
+			if(removingGene.inID == otherGeneCopy[i].inID &&
+			   removingGene.outID == otherGeneCopy[i].outID &&
+			   removingGene.generation == otherGeneCopy[i].generation)
+			{
+				otherGeneCopy.erase(otherGeneCopy.begin() + i);
+			}
+		}
+	}
+	
+	for(auto & removingBias : resultantBias)
+	{
+		for(unsigned int i = 0; i < thisBiasCopy.size(); ++i)
+		{
+			if(removingBias.node == thisBiasCopy[i].node &&
+			   removingBias.generation == thisBiasCopy[i].generation)
+			{
+				thisBiasCopy.erase(thisBiasCopy.begin() + i);
+			}
+		}
+		for(unsigned int i = 0; i < otherBiasCopy.size(); ++i)
+		{
+			
+			if(removingBias.node == otherBiasCopy[i].node &&
+			   removingBias.generation == otherBiasCopy[i].generation)
+			{
+				otherBiasCopy.erase(otherBiasCopy.begin() + i);
+			}
+		}
+	}
+
+	bool used;
+	for(auto & testingGene : thisGeneCopy)
+	{
+		used = false;
+		for(auto & compareGene : otherGeneCopy)
+		{
+			if(testingGene.generation == compareGene.generation)
+			{
+				used = true;
+				resultant.addGene(rand() % 2 == 0 ? compareGene:testingGene);
+			}
+		}
+		if(!used)
+			resultant.addGene(testingGene);
+	}
+	
+	for(auto & testingBias : thisBiasCopy)
+	{
+		used = false;
+		for(auto & compareBias : otherBiasCopy)
+		{
+			if(testingBias.generation == compareBias.generation)
+			{
+				used = true;
+				resultant.addBias(rand() % 2 == 0 ? compareBias:testingBias);
+			}
+		}
+		if(!used)
+			resultant.addBias(testingBias);
+	}
+
+	resultantGenes = resultant.getGeneVector();
+	resultantBias = resultant.getBiasVector();
+	
+	for(auto & removingGene : resultantGenes)
+	{
+		for(unsigned int i = 0; i < thisGeneCopy.size(); ++i)
+			if(removingGene.generation == thisGeneCopy[i].generation)
+				thisGeneCopy.erase(thisGeneCopy.begin() + i);
+
+		for(unsigned int i = 0; i < otherGeneCopy.size(); ++i)
+			if(removingGene.generation == otherGeneCopy[i].generation)
+				otherGeneCopy.erase(otherGeneCopy.begin() + i);
+	}
+
+	for(auto & removingBias : resultantBias)
+	{
+		for(unsigned int i = 0; i < thisBiasCopy.size(); ++i)
+			if(removingBias.generation == thisBiasCopy[i].generation)
+				thisBiasCopy.erase(thisBiasCopy.begin() + i);
+
+		for(unsigned int i = 0; i < otherBiasCopy.size(); ++i)
+			if(removingBias.generation == otherBiasCopy[i].generation)
+				otherBiasCopy.erase(otherBiasCopy.begin() + i);
+	}
+
+	if(otherGeneCopy.size() > 0)
+		for(auto & gene : otherGeneCopy)
+			resultant.addGene(gene);
+
+	if(otherBiasCopy.size() > 0)
+		for(auto & bias : otherBiasCopy)
+			resultant.addBias(bias);
+	
 	return resultant;
 }
 

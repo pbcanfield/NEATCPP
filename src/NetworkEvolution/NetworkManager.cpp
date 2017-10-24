@@ -113,7 +113,35 @@ void NetworkManager::sortSupervisedNetworks()
 
 void NetworkManager::crossTopHalf()
 {
+	unsigned int start,size;
+	bool isOdd;
+	for(auto & vec : networks)
+	{
+		size = vec.size();
+		
+		if(size % 2 == 0)
+		{
+			start = size/2;
+			isOdd = false;
+		}
+		else
+		{
+			start = (size + 1)/2;
+			isOdd = true;
+		}
 
+		for(unsigned int i = start; i < size; ++i)
+			vec.pop_back();
+
+		size = vec.size();
+		
+		if(isOdd)
+			for(unsigned int i = 0; i < start - 1; ++i)
+				vec.push_back(*vec[i] + vec[i + 1]);
+		else
+			for(unsigned int i = 0; i < start; ++i)
+				vec.push_back(*vec[i] + vec[i + 1]);
+	}
 }
 
 
@@ -137,7 +165,9 @@ void NetworkManager::reinforcementSimulate(unsigned int numGenerations,unsigned 
 		}
 		trainNetworksOnline(epochs,lr);
 		sortSupervisedNetworks();
-		//crossTopHalf();
+		crossTopHalf();
+		std::cout << "Done simulating: " << i + 1 << " out of " << numGenerations << " generations [";
+		std::cout << i * 100. /numGenerations << "% Done]" << std::endl;
 	}
 	std::cout << "Done Simulating" << std::endl;
 }
