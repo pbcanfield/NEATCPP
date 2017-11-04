@@ -8,7 +8,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
-#include <random>
+#include <algorithm>
 #include "Gene.h"
 
 class Genome
@@ -18,7 +18,7 @@ public:
 	Genome(unsigned int, unsigned int);
 	Genome(std::string);
 
-    void cross(Genome &);
+    Genome cross(Genome);
 
     void addGene(Gene);
     void addBias(Bias);
@@ -34,6 +34,8 @@ public:
 	void saveGenome(std::string);
 	void loadFromFile(std::string);
     void copyIntoGenome(Genome &);
+	void sortByGeneration();
+
 
     std::vector<Gene> getGeneVector();
     std::vector<Bias> getBiasVector();
@@ -48,10 +50,12 @@ public:
 	std::vector<std::vector<unsigned int>> getHidden();
 	std::vector<unsigned int> getOutput();
 
-private:
-    bool isSimilarGene(Gene,unsigned int);
-    bool isSimilarBias(Bias,unsigned int);
 
+	bool geneExist(unsigned int, unsigned int);
+
+    double randomNumber();
+
+private:
 	std::vector<Gene> geneticCode;
     std::vector<Bias> biasInfo;
 	std::vector<unsigned int> input;

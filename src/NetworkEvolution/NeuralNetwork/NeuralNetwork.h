@@ -15,22 +15,22 @@
 #include <thread>
 #include <mutex>
 #include <atomic>
-#include <random>
 
 
 class NeuralNetwork
 {
 public:
-    NeuralNetwork();
-    NeuralNetwork(std::string);
-    NeuralNetwork(Genome);
+    NeuralNetwork(unsigned int=rand());
+    NeuralNetwork(std::string,unsigned int=rand());
+    NeuralNetwork(Genome,unsigned int=rand());
 
-    NeuralNetwork * operator+(NeuralNetwork &);
+    NeuralNetwork * operator+(NeuralNetwork*);
 
     ~NeuralNetwork();
 
     void updateStructure();
-    void mutateAddWeight(unsigned int, unsigned int);
+    void randomMutation(float,float,float);
+	void mutateAddWeight(unsigned int, unsigned int);
     void mutateAddNode(unsigned int, unsigned int);
     void mutateAddBias(unsigned int);
 
@@ -47,7 +47,9 @@ public:
     std::vector<double> getNetworkOutput();
 
     void visualize(unsigned int, unsigned int, unsigned int=5);
+	void updateGeneration();
 
+	Genome getGenome() {return *dna; }
 private:
     Node * findNodeWithID(unsigned int);
     void processForward(unsigned int,unsigned int);
@@ -62,7 +64,8 @@ private:
     void updateBias(Node *, unsigned int &);
 
     void addWeight(Node *, Node *, double);
-
+	
+	unsigned int generateRandomNodeID(bool=true);
 
     std::vector<Node*> inputs;
     std::vector<std::vector<Node*>> hiddenLayer;
@@ -72,6 +75,7 @@ private:
     Genome * dna;
 
     unsigned int generation;
+	unsigned int lastGeneratedLayer;
 
     //multithreading
     std::vector<std::thread*> threads;
@@ -81,10 +85,6 @@ private:
     std::atomic<unsigned int> completed;
 
 
-    //Random numbers.
-    std::random_device rd;
-    std::mt19937 gen;
-    std::uniform_real_distribution<double> dis{-10.0,10.0};
 };
 
 #endif

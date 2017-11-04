@@ -9,11 +9,11 @@
  * This is the defualt constructor that sets the generation to zero
  * and allocates the memory for the genome of this Neural Network.
  */
-NeuralNetwork::NeuralNetwork()
+NeuralNetwork::NeuralNetwork(unsigned int seed)
 {
+    srand(seed);
     generation = 0;
     dna = new Genome();
-    gen.seed(rd());
 }
 
 
@@ -22,11 +22,11 @@ NeuralNetwork::NeuralNetwork()
  * load the genome from a specified charzar file and updates structure
  * accordingly.
  */
-NeuralNetwork::NeuralNetwork(std::string dir)
+NeuralNetwork::NeuralNetwork(std::string dir, unsigned int seed)
 {
+    srand(seed);
     dna = new Genome();
     generation = 0;
-    gen.seed(rd());
 
 
     dna -> loadFromFile(dir);
@@ -39,11 +39,11 @@ NeuralNetwork::NeuralNetwork(std::string dir)
  * This is a constructor that takes a genome and copies that genome
  * into this networks genome and updates the structure accordingly.
  */
-NeuralNetwork::NeuralNetwork(Genome code)
+NeuralNetwork::NeuralNetwork(Genome code, unsigned int seed)
 {
+    srand(seed);
     dna = new Genome();
     generation = 0;
-    gen.seed(rd());
 
     dna -> copyIntoGenome(code);
     updateStructure();
@@ -55,10 +55,14 @@ NeuralNetwork::NeuralNetwork(Genome code)
  * by crossing the genomes of the NeuralNetworks and returning a new
  * network pointer.
  */
-NeuralNetwork * NeuralNetwork::operator+(NeuralNetwork & one)
+NeuralNetwork * NeuralNetwork::operator+(NeuralNetwork * two)
 {
-    NeuralNetwork * networkPtr;
-    return networkPtr;
+	NeuralNetwork * networkPtr;
+	
+	Genome child = dna -> cross(two -> getGenome());
+	networkPtr = new NeuralNetwork(child);
+	
+	return networkPtr;
 }
 
 /**
@@ -147,6 +151,32 @@ void NeuralNetwork::updateStructure()
 
 }
 
+void NeuralNetwork::randomMutation(float node, float bias, float connection) 
+{
+	float rnd = rand()/(float)RAND_MAX;
+	bias += node;
+	connection += bias;
+	
+	//Determine what the mutation is based on the probabilities given.
+	
+	if(rnd < node)
+	{
+		unsigned int first = generateRandomNodeID();
+		unsigned int last = generateRandomNodeID(false);
+		mutateAddNode(first,last);
+	}
+	else if(rnd < bias)
+	{
+		mutateAddBias(rand()  % (dna -> lastNode() + 1));
+	}
+	else if(rnd < connection)
+	{
+		unsigned int first = generateRandomNodeID();
+		unsigned int last = generateRandomNodeID(false);
+		mutateAddWeight(first,last);
+	}
+}
+
 
 /**
  * The mutateAddWeight member function takes in two node ID's and creates a Weight
@@ -156,7 +186,7 @@ void NeuralNetwork::updateStructure()
 void NeuralNetwork::mutateAddWeight(unsigned int nodeOne, unsigned int nodeTwo)
 {
     //Change 1 to a random weight later.
-    double weight = dis(gen);
+    double weight = dna -> randomNumber();
     Gene connection;
     connection.inID = nodeOne;
     connection.outID = nodeTwo;
@@ -164,7 +194,6 @@ void NeuralNetwork::mutateAddWeight(unsigned int nodeOne, unsigned int nodeTwo)
     connection.generation = generation;
     addWeight(findNodeWithID(nodeOne),findNodeWithID(nodeTwo),weight);
     dna -> addGene(connection);
-    ++generation;
 }
 
 
@@ -181,8 +210,8 @@ void NeuralNetwork::mutateAddWeight(unsigned int nodeOne, unsigned int nodeTwo)
  */
 void NeuralNetwork::mutateAddNode(unsigned int nodeOne, unsigned int nodeTwo)
 {
-
-    unsigned int layer = findLayerFromNodeID(nodeOne);
+	
+	unsigned int layer = findLayerFromNodeID(nodeOne);
     unsigned int layerDiff = findLayerFromNodeID(nodeTwo) - layer;
     unsigned int nodeID = ++dna -> lastNode();
 
@@ -201,7 +230,7 @@ void NeuralNetwork::mutateAddNode(unsigned int nodeOne, unsigned int nodeTwo)
     hiddenLayer[layer].push_back(new Node(nodeID));
     Node * middle = hiddenLayer[layer].back();
 
-    double w1 = dis(gen), w2 = dis(gen);
+    double w1 = dna -> randomNumber(), w2 = dna -> randomNumber();
 
     addWeight(first, middle, w1);
     addWeight(middle, last, w2);
@@ -221,7 +250,6 @@ void NeuralNetwork::mutateAddNode(unsigned int nodeOne, unsigned int nodeTwo)
     connection.outID = lastID;
     connection.weight = w2;
     dna -> addGene(connection);
-    ++generation;
 }
 
 
@@ -234,13 +262,12 @@ void NeuralNetwork::mutateAddBias(unsigned int node)
 {
     Bias bias;
     //Again change 1 to a random number.
-    double rBias = dis(gen);
+    double rBias = dna -> randomNumber();
     bias.node = node;
     bias.bias = rBias;
     bias.generation = generation;
     dna -> addBias(bias);
     findNodeWithID(node) -> bias() = rBias;
-    ++generation;
 }
 
 
@@ -466,6 +493,16 @@ void NeuralNetwork::visualize(unsigned int x, unsigned int y, unsigned int updat
 
 }
 
+/**
+ * This is the member function that is responsible for updating the generation
+ * Number in the NeuralNetwork. This function will be called by the NetworkManager
+ * after each generation.
+ */ 
+
+void NeuralNetwork::updateGeneration()
+{
+	++generation;
+}
 
 /**
  * This is a function that takes a linear identification number and searches
@@ -949,4 +986,40 @@ unsigned int NeuralNetwork::findLayerFromNodeID(unsigned int ID)
 
     return layer;
 
+}
+
+
+/**
+ * Generates a random ID that has not yet been used in random number generation
+ * while also ensuring that this set of random numbers is always a valid pair
+ * for the mutateAddNode and mutateAddWeight functions.
+ *
+ * @param lastnode The last node ID that was generated
+ * @param isFirst  A defualt boolean value that specifies if this is the
+ *				   first or second number being generated.
+ */
+unsigned int NeuralNetwork::generateRandomNodeID(bool isFirst)
+{
+	unsigned int ID;
+
+	if(isFirst)
+	{
+		unsigned int testingLayer;
+		do
+		{
+			ID = rand() % (dna -> lastNode() + 1);
+			testingLayer = findLayerFromNodeID(ID);
+		} while(testingLayer == hiddenLayer.size() + 1);
+
+		lastGeneratedLayer = testingLayer;
+	}
+	else
+	{
+		do
+		{
+			ID = rand() % (dna -> lastNode() + 1);
+		} while(findLayerFromNodeID(ID) <= lastGeneratedLayer);
+	}
+	
+	return ID;
 }
