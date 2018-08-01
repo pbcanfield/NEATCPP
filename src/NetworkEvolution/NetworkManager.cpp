@@ -159,7 +159,7 @@ void NetworkManager::reinforcementSimulate(unsigned int numGenerations,unsigned 
 			for(auto & network : vec)
 			{
 				network -> updateGeneration();
-				if(isMutation());
+				if(isMutation())
 						network -> randomMutation(nodeAddProb,biasAddProb,connectionProb);
 			}
 		}

@@ -22,7 +22,7 @@ public:
 	 */
 	void setNetworkInputs(std::vector<std::vector<double>>);
 	
-	`/**
+	/**
 	 * Sets the training values that will be used for each NeuralNetwork.
 	 * @param std::vector<std::vector<double>>  This is the trainging values that are used
 	 *                                          for each NeualNetwork, each 
