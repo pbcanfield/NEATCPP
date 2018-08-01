@@ -1,6 +1,7 @@
 #ifndef NETWORKMANAGER_H
 #define NETWORKMANAGER_H
 #include "NeuralNetwork/NeuralNetwork.h"
+#include "../ProgressBar/ProgressBar.hpp"
 #include <thread>
 #include <vector>
 

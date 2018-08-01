@@ -1,5 +1,5 @@
-NEAT:	NetworkManager.o Genome.o NeuralNetwork.o Node.o Weight.o main.o
-	g++ -Wall -g -std=c++14 -pthread obj/Genome.o obj/Node.o obj/NeuralNetwork.o obj/NetworkManager.o obj/Weight.o  obj/main.o -lsfml-graphics -lsfml-window -lsfml-system -o exec/NEAT
+NEAT:	ProgressBar.o NetworkManager.o Genome.o NeuralNetwork.o Node.o Weight.o main.o
+	g++ -Wall -g -std=c++14 -pthread obj/ProgressBar.o obj/Genome.o obj/Node.o obj/NeuralNetwork.o obj/NetworkManager.o obj/Weight.o  obj/main.o -lsfml-graphics -lsfml-window -lsfml-system -o exec/NEAT
 
 main.o:	src/main.cpp
 	g++ -Wall -g -std=c++14 -pthread -c src/main.cpp -o obj/main.o
@@ -18,6 +18,9 @@ Node.o:	src/NetworkEvolution/NeuralNetwork/Node.cpp src/NetworkEvolution/NeuralN
 
 Weight.o:	src/NetworkEvolution/NeuralNetwork/Weight.cpp src/NetworkEvolution/NeuralNetwork/Weight.h
 	g++ -Wall -g -std=c++14 -pthread -c src/NetworkEvolution/NeuralNetwork/Weight.cpp -o obj/Weight.o
+
+ProgressBar.o: src/ProgressBar/ProgressBar.cpp src/ProgressBar/ProgressBar.hpp
+	g++ -Wall -g -std=c++14 -pthread -c src/ProgressBar/ProgressBar.cpp -o obj/ProgressBar.o
 
 clean:
 	rm -rf obj/* exec/*

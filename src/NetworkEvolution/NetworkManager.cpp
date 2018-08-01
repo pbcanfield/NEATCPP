@@ -152,12 +152,16 @@ void NetworkManager::crossTopHalf()
  */
 void NetworkManager::reinforcementSimulate(unsigned int numGenerations,unsigned int epochs, double lr)
 {
+	ProgressBar simulationProgress(50,'#',true);
+	std::cout << "Simulating Generations" << std::endl;
+
 	for(unsigned int i = 0; i < numGenerations; ++i)
 	{
 		for(auto & vec : networks)
 		{
 			for(auto & network : vec)
 			{
+				
 				network -> updateGeneration();
 				if(isMutation())
 						network -> randomMutation(nodeAddProb,biasAddProb,connectionProb);
@@ -166,10 +170,10 @@ void NetworkManager::reinforcementSimulate(unsigned int numGenerations,unsigned 
 		trainNetworksOnline(epochs,lr);
 		sortSupervisedNetworks();
 		crossTopHalf();
-		std::cout << "Done simulating: " << i + 1 << " out of " << numGenerations << " generations [";
-		std::cout << i * 100. /numGenerations << "% Done]" << std::endl;
+		
+		simulationProgress.update(i + 1,numGenerations);
 	}
-	std::cout << "Done Simulating" << std::endl;
+	std::cout << std::endl << "Done Simulating" << std::endl;
 }
 
 /**

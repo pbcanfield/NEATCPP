@@ -11,7 +11,7 @@ int main( int argc, char * argv[])
     
 	
 	
-	NetworkManager test(200,2,2);
+	NetworkManager test(2000,2,2);
 
     std::vector<std::vector<double>> inputs {{0.2,0.1}};
     std::vector<std::vector<double>> training {{0.1,0.2}};
@@ -19,7 +19,7 @@ int main( int argc, char * argv[])
 	test.setNetworkInputs(inputs);
 	test.setNetworkTraining(training);
 
-    test.reinforcementSimulate(10,100);
+    test.reinforcementSimulate(10,10);
 
 	/*
 	Genome code(3,3);
